@@ -1,0 +1,198 @@
+<title>Be My Mentor — Diário</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+  :root {
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #5c5c5c;
+    --border: #d9d9d9;
+    --border-strong: #0a0a0a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: 20px;
+  }
+
+  a { color: var(--fg); }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-block: 40px 96px;
+  }
+
+  header.site {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block-end: 20px;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .site-name {
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .site-tagline {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+
+  .meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 44px;
+    flex-wrap: wrap;
+  }
+
+  .meta .dot { opacity: 0.6; }
+
+  article > p {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin: 0 0 22px;
+    max-width: 62ch;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 48px 0 18px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  h3:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: -4px 0 26px;
+  }
+
+  .byline .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .link-note {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 56px 0;
+  }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 1.7rem; }
+    article > p { font-size: 1rem; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="site">
+    <span class="site-name">Be My Mentor</span>
+    <span class="site-tagline">build in public</span>
+  </header>
+
+  <main>
+    <div class="eyebrow">Atualização · Diário de bordo</div>
+    <h1>19 anos, três meses e uma ideia que já falhou vinte vezes</h1>
+    <div class="meta">
+      <span>Cauan &amp; Bruno</span>
+      <span class="dot">·</span>
+      <span>Registro nº 1</span>
+    </div>
+
+    <article>
+      <h3>A decisão de sair da caixinha</h3>
+      <div class="byline"><span class="avatar">C</span> Cauan</div>
+
+      <p>Demorei 19 anos pra escrever esse texto, mas não sabia que ia escrevê-lo há 3 meses atrás. Foi o período em que empreender deixou de ser uma coisa de filmes e passou a ser uma possibilidade real de futuro. Mas pra isso tive que sair da minha caixinha de um mundo corporativo onde iria trabalhar em empresas renomadas, ter um bom salário e uma vida relativamente confortável. Quando me pergunto por que tomei essa decisão, eu lembro que ter uma vida confortável nunca foi meu principal objetivo — meu objetivo real era ser lembrado como alguém que construiu algo grande e que causou impacto, assim como muitos jovens assistem à Rede Social e querem empreender assim que terminam de ver o filme.</p>
+
+      <p>Com o passar do tempo deixei isso de lado. Me adequei a caminhos óbvios e mais seguros, mas acho que foram justamente esses caminhos seguros que me causaram incômodo — a sensação de passar pela vida sem deixar minha marca nela, sem saber se impactei positivamente a vida de muitas pessoas, me causava questionamentos. Em grande parte por isso estou escrevendo esse texto e fazendo o que estou fazendo há três meses: build in public. Gosto desse conceito, por que não? Me chamo Cauan, tenho 19 anos e estou construindo uma rede social universitária. Se isso vai dar certo? Eu não sei, mas vou fazer tudo o que for possível para que sim.</p>
+
+      <h3>Sobre a ideia</h3>
+      <div class="byline"><span class="avatar">B</span> Bruno</div>
+
+      <p>Antes de partir para a ideia, queríamos deixar claro que, antes de chegar a ela, tivemos pelo menos outras 20 que falharam miseravelmente. De certa forma esse é nosso maior sucesso — e olha que nem lançamos o MVP ainda.</p>
+
+      <p>Notamos que os estudantes estão cada vez mais reclusos, talvez como consequência direta da forma como as mídias sociais tradicionais nos estimulam a agir. Fomos entender esse problema mais a fundo e, para isso, rodamos uma pesquisa em mais de 20 universidades do país. Com as respostas que obtivemos até o momento, notamos que aproximadamente 77% dos estudantes universitários relataram já ter querido falar com alguém no campus e não ter conseguido. Quando perguntamos o motivo, a maioria cita a falta de um pretexto pra iniciar a conversa.</p>
+
+      <p>Com isso, pensamos: por que não criar esse pretexto? Mas não poderia ser apenas um pretexto para conversar — teria que ser também um lugar onde trocas reais acontecem. Foi aí que veio a ideia: podemos criar um espaço onde estudantes com maior facilidade em determinadas matérias ajudam quem tem menos facilidade. Sim, eu sei que isso já existe — a diferença é que essa ajuda é estimulada por uma economia circular, em que ao ajudar com uma mentoria o usuário ganha tempo para receber uma mentoria. Além disso, queremos garantir ao mentor que ele ganhe horas complementares pelo tempo dedicado à aula, que pode ser de 15, 30, 45 minutos ou até uma hora. Unimos o melhor dos dois mundos: pessoas dispostas a ajudar e alunos que precisam desse apoio. E lembra lá do início, quando falamos sobre pretexto? Pra que pretexto melhor do que "me ajuda no conteúdo da prova de amanhã"?</p>
+
+      <p>O que começa com uma mentoria pode virar uma amizade. Muitas coisas ainda estão sendo discutidas, mais atualizações surgirão em breve. Por enquanto, ficamos felizes por estarmos construindo em público.</p>
+
+      <hr class="divider">
+
+      <p class="link-note">Quer ajudar a validar essa ideia? Respondendo <a href="https://forms.gle/rpsvzo4Q3YHDb65R7" target="_blank" rel="noopener">essa pesquisa rápida</a> você contribui diretamente para o que estamos construindo.</p>
+    </article>
+  </main>
+
+  <footer>
+    Be My Mentor — construindo em público, um registro por vez.
+  </footer>
+</div>
