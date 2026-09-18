@@ -1,0 +1,45 @@
+<title>Be My Mentor — Newsletter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="style.css">
+
+<div class="wrap">
+  <header class="site">
+    <nav class="site-nav">
+      <a href="index.html">Diário</a>
+      <a href="fundadores.html">Fundadores</a>
+      <a href="newsletter.html" aria-current="page">Newsletter</a>
+    </nav>
+    <a class="site-name" href="index.html">Be My Mentor</a>
+  </header>
+
+  <main>
+    <div class="eyebrow">Não perca as próximas</div>
+    <h1>Newsletter</h1>
+    <p class="lede" style="margin-bottom: 44px;">Um e-mail sempre que tivermos uma atualização real pra contar — sem spam, sem ruído.</p>
+
+    <form class="newsletter" id="newsletter-form">
+      <label for="newsletter-email" class="visually-hidden">E-mail</label>
+      <input type="email" id="newsletter-email" name="email" placeholder="seu@email.com" required>
+      <button type="submit">Inscrever</button>
+    </form>
+    <p class="newsletter-note">Enviamos só quando temos algo pra dizer.</p>
+    <p class="newsletter-status" id="newsletter-status" hidden></p>
+  </main>
+
+  <footer>
+    Be My Mentor — construindo em público, um registro por vez.
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('newsletter-form');
+    var status = document.getElementById('newsletter-status');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.textContent = 'Recebido — te avisamos na próxima atualização.';
+      status.hidden = false;
+      form.reset();
+    });
+  })();
+</script>
