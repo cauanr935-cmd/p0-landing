@@ -34,12 +34,33 @@
 <script>
   (function () {
     var form = document.getElementById('newsletter-form');
+    var emailInput = document.getElementById('newsletter-email');
     var status = document.getElementById('newsletter-status');
+    var button = form.querySelector('button');
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      status.textContent = 'Recebido — te avisamos na próxima atualização.';
-      status.hidden = false;
-      form.reset();
+      button.disabled = true;
+
+      fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value })
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          if (!result.ok || !result.data.ok) throw new Error(result.data.error || 'falha');
+          status.textContent = 'Recebido — te avisamos na próxima atualização.';
+          status.hidden = false;
+          form.reset();
+        })
+        .catch(function () {
+          status.textContent = 'Não conseguimos enviar agora. Tenta de novo em instantes.';
+          status.hidden = false;
+        })
+        .finally(function () {
+          button.disabled = false;
+        });
     });
   })();
 </script>
