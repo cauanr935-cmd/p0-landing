@@ -9,7 +9,6 @@ export default defineConfig({
       input: {
         main: resolve(root, 'index.html'),
         fundadores: resolve(root, 'fundadores.html'),
-        newsletter: resolve(root, 'newsletter.html'),
       },
     },
   },
