@@ -1,11 +1,14 @@
-  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
   :root {
-    --bg: #ffffff;
-    --fg: #0a0a0a;
-    --muted: #5c5c5c;
-    --border: #d9d9d9;
-    --border-strong: #0a0a0a;
+    --bg: #f7f5ff;
+    --card: #ffffff;
+    --purple: #7c3aed;
+    --purple2: #5b21b6;
+    --fg: #1a0533;
+    --muted: #9284b3;
+    --border: #e4dcff;
+    --border-strong: #1a0533;
   }
 
   * { box-sizing: border-box; }
@@ -19,7 +22,7 @@
     padding-inline: 20px;
   }
 
-  a { color: var(--fg); }
+  a { color: var(--purple); }
 
   .wrap {
     max-width: 680px;
@@ -50,6 +53,7 @@
   }
 
   nav.site-nav a {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.82rem;
     font-weight: 500;
     letter-spacing: 0.01em;
@@ -60,20 +64,37 @@
 
   nav.site-nav a:hover,
   nav.site-nav a:focus-visible {
-    color: var(--fg);
+    color: var(--purple);
   }
 
   nav.site-nav a[aria-current="page"] {
-    color: var(--fg);
+    color: var(--purple);
   }
 
   .site-name {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Playfair Display', serif;
     font-weight: 800;
     font-size: 1.05rem;
     letter-spacing: -0.01em;
     text-decoration: none;
     color: var(--fg);
     margin-left: auto;
+  }
+
+  .site-name .logo-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--purple);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .3; transform: scale(1.5); }
   }
 
   .visually-hidden {
@@ -86,6 +107,7 @@
   }
 
   .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
     text-transform: uppercase;
     font-size: 0.72rem;
     letter-spacing: 0.14em;
@@ -95,6 +117,7 @@
   }
 
   h1 {
+    font-family: 'Playfair Display', serif;
     font-size: clamp(1.9rem, 5vw, 2.6rem);
     font-weight: 800;
     line-height: 1.12;
@@ -103,11 +126,69 @@
     text-wrap: balance;
   }
 
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 800;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    text-wrap: balance;
+  }
+
+  .registro-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .registro-card {
+    display: block;
+    padding: 26px 24px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .registro-card:hover,
+  .registro-card:focus-visible {
+    border-color: var(--purple);
+    box-shadow: 5px 5px 0 var(--purple);
+    transform: translate(-2px, -2px);
+  }
+
+  .registro-card .eyebrow { margin-bottom: 10px; }
+
+  .registro-card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 10px;
+  }
+
+  .registro-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    max-width: 58ch;
+  }
+
+  .registro-cta {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--purple);
+  }
+
   .meta {
     display: flex;
     gap: 10px;
     align-items: center;
     color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.85rem;
     margin-bottom: 44px;
     flex-wrap: wrap;
@@ -122,7 +203,19 @@
     max-width: 62ch;
   }
 
+  article > ul {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0 0 22px;
+    padding-left: 22px;
+    max-width: 62ch;
+  }
+
+  article > ul li { margin-bottom: 8px; }
+  article > ul li::marker { color: var(--purple); }
+
   h3 {
+    font-family: 'Playfair Display', serif;
     font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -140,6 +233,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.85rem;
     color: var(--muted);
     margin: -4px 0 26px;
@@ -150,12 +244,22 @@
     height: 26px;
     border-radius: 50%;
     border: 1.5px solid var(--border-strong);
+    background: var(--purple);
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.7rem;
     font-weight: 700;
     flex-shrink: 0;
+  }
+
+  .byline .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .link-note {
@@ -177,60 +281,11 @@
     max-width: 56ch;
   }
 
-  form.newsletter {
-    display: flex;
-    gap: 0;
-    border: 1.5px solid var(--border-strong);
-    max-width: 440px;
-  }
-
-  form.newsletter input[type="email"] {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    color: var(--fg);
-    font-family: inherit;
-    font-size: 0.95rem;
-    padding: 14px 16px;
-  }
-
-  form.newsletter input[type="email"]::placeholder { color: var(--muted); }
-  form.newsletter input[type="email"]:focus { outline: none; }
-  form.newsletter input[type="email"]:focus-visible { outline: 2px solid var(--fg); outline-offset: -2px; }
-
-  form.newsletter button {
-    border: none;
-    border-left: 1.5px solid var(--border-strong);
-    background: var(--fg);
-    color: var(--bg);
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    padding: 0 22px;
-    cursor: pointer;
-  }
-
-  form.newsletter button:hover { opacity: 0.85; }
-  form.newsletter button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-
-  .newsletter-note {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 12px;
-  }
-
-  .newsletter-status {
-    font-size: 0.88rem;
-    font-weight: 600;
-    margin-top: 14px;
-  }
-
   footer {
     margin-top: 72px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.82rem;
     color: var(--muted);
   }

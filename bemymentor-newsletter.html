@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>BeMyMentor · Build in Public</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f7f5ff;
+      --card:     #ffffff;
+      --purple:   #7c3aed;
+      --purple2:  #5b21b6;
+      --text:     #1a0533;
+      --muted:    #9284b3;
+      --border:   #e4dcff;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .logo-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: blink 2.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.3; transform:scale(1.5); }
+    }
+
+    .hd-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--purple);
+      color: #fff;
+      padding: 5px 14px;
+      clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 52px 28px 36px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .headline {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(38px, 10vw, 60px);
+      font-weight: 800;
+      line-height: 1.04;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .headline-accent { color: var(--purple); }
+
+    .subline {
+      font-size: 15px;
+      line-height: 1.72;
+      color: var(--muted);
+      margin-bottom: 38px;
+      max-width: 420px;
+    }
+
+    .subline strong { color: var(--text); }
+
+    /* ── BUTTON — convidativo ao toque ──
+       Ideia: bloco sólido com peso visual real.
+       Sombra offset desloca ao hover como se fosse pressionar físico.
+       Sem clip-path — o poder está no movimento tátil.
+    */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 16px 32px;
+      border: 2.5px solid var(--text);
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: .01em;
+      box-shadow: 5px 5px 0 var(--text);
+      transition: box-shadow .12s ease, transform .12s ease;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 8px 8px 0 var(--text);
+      transform: translate(-3px, -3px);
+    }
+
+    .btn-primary:active {
+      box-shadow: 2px 2px 0 var(--text);
+      transform: translate(3px, 3px);
+    }
+
+    .btn-arrow {
+      display: inline-block;
+      transition: transform .2s ease;
+    }
+
+    .btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--purple);
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 15px 28px;
+      border: 2.5px solid var(--purple);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--purple);
+      transition: box-shadow .12s, transform .12s, background .15s, color .15s;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .btn-secondary:hover {
+      background: var(--purple);
+      color: #fff;
+      box-shadow: 7px 7px 0 var(--purple2);
+      transform: translate(-2px,-2px);
+    }
+
+    .btn-secondary:active {
+      box-shadow: 1px 1px 0 var(--purple2);
+      transform: translate(3px, 3px);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 44px;
+    }
+
+    /* ── FORM ── */
+    .form-wrap {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 26px 22px;
+      margin-bottom: 44px;
+      box-shadow: 4px 4px 0 var(--border);
+    }
+
+    .form-label { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+    .input-stack { display: flex; flex-direction: column; gap: 10px; }
+
+    .input-stack input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 13px 16px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: border-color .2s;
+    }
+
+    .input-stack input::placeholder { color: var(--muted); opacity: .6; }
+    .input-stack input:focus { border-color: var(--purple); }
+
+    .btn-form {
+      width: 100%;
+      background: var(--purple);
+      color: #fff;
+      border: 2.5px solid var(--text);
+      border-radius: 4px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 14px;
+      cursor: pointer;
+      letter-spacing: .01em;
+      box-shadow: 4px 4px 0 var(--text);
+      transition: box-shadow .12s, transform .12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-form:hover {
+      box-shadow: 7px 7px 0 var(--text);
+      transform: translate(-2px,-2px);
+    }
+
+    .btn-form:active {
+      box-shadow: 1px 1px 0 var(--text);
+      transform: translate(3px,3px);
+    }
+
+    .form-meta {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+      opacity: .7;
+    }
+
+    /* ── STATS ── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+      margin-bottom: 52px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 10px;
+      text-align: center;
+      box-shadow: 3px 3px 0 var(--border);
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--purple);
+      display: block;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      padding: 0 28px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── MATCH CARD ── */
+    .card-wrap {
+      padding: 0 28px 52px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .match-card {
+      background: var(--text);
+      border-radius: 18px;
+      padding: 24px 20px 20px;
+      border: 2px solid var(--text);
+      box-shadow: 5px 5px 0 var(--purple);
+    }
+
+    .match-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .avatars { display: flex; align-items: center; }
+
+    .avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 3px solid var(--text);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .av-a { background: var(--purple); color: #fff; z-index: 2; }
+    .av-b { background: #fff; color: var(--purple); margin-left: -12px; z-index: 1; }
+
+    .match-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .match-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    .match-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+    .match-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,.07);
+      border-radius: 10px;
+      padding: 11px 13px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .row-icon { font-size: 16px; flex-shrink: 0; }
+    .row-main { font-size: 13px; font-weight: 600; color: #fff; }
+    .row-sub  { font-size: 11px; color: var(--muted); }
+
+    .match-badge {
+      background: var(--purple);
+      border-radius: 10px;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1.5px solid rgba(255,255,255,.15);
+    }
+
+    .badge-icon { font-size: 20px; }
+    .badge-main { font-size: 13px; font-weight: 700; color: #fff; }
+    .badge-sub  { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+    /* ── EDITIONS GRID ── */
+    .editions-wrap {
+      padding: 0 28px 28px;
+      max-width: 540px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .ed-item {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 4px 4px 0 var(--border);
+      transition: border-color .15s, box-shadow .12s, transform .12s;
+    }
+
+    .ed-item:hover {
+      border-color: var(--purple);
+      box-shadow: 6px 6px 0 var(--purple);
+      transform: translate(-2px,-2px);
+    }
+
+    .ed-item:active {
+      box-shadow: 1px 1px 0 var(--purple);
+      transform: translate(3px,3px);
+    }
+
+    .ed-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--purple);
+      background: rgba(124,58,237,.1);
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 3px;
+      align-self: flex-start;
+    }
+
+    .ed-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      flex: 1;
+    }
+
+    .ed-arrow {
+      font-size: 18px;
+      color: var(--muted);
+      align-self: flex-end;
+      transition: transform .2s;
+    }
+
+    .ed-item:hover .ed-arrow { transform: translate(3px,-3px); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px;
+      text-align: center;
+      border-top: 1.5px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    footer a { color: var(--purple); text-decoration: none; }
+
+    @media (max-width: 380px) {
+      .editions-wrap { grid-template-columns: 1fr; }
+      .hero { padding: 36px 20px 28px; }
+      .card-wrap, .editions-wrap, .section-label { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      BeMyMentor
+    </div>
+    <span class="hd-badge">Build in Public</span>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">newsletter semanal · gratuita</p>
+    <h1 class="headline">
+      Uma startup<br>
+      construída<br>
+      <span class="headline-accent">ao vivo.</span>
+    </h1>
+    <p class="subline">
+      Toda semana, Cauan &amp; Bruno contam o que testaram, o que quebrou
+      e o que aprenderam enquanto constroem
+      <strong>a maior rede social universitária do Brasil</strong>. Sem filtro.
+    </p>
+
+    <div class="btn-row">
+      <button class="btn-primary">
+        Quero acompanhar
+        <span class="btn-arrow">→</span>
+      </button>
+      <a href="#" class="btn-secondary">Ler edições</a>
+    </div>
+
+    <div class="form-wrap">
+      <p class="form-label">Receba o próximo registro no seu e-mail 👇</p>
+      <div class="input-stack">
+        <input type="email" placeholder="seu@email.com" />
+        <button class="btn-form">
+          Entrar na lista
+          <span>→</span>
+        </button>
+      </div>
+      <p class="form-meta">Gratuito · Sem spam · Cancele quando quiser</p>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat">
+        <span class="stat-num">2</span>
+        <span class="stat-lbl">Registros publicados</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">20+</span>
+        <span class="stat-lbl">Universidades pesquisadas</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">77%</span>
+        <span class="stat-lbl">Queriam falar, não conseguiram</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="section-label">✦ Registro mais recente</p>
+  <div class="card-wrap">
+    <div class="match-card">
+      <div class="match-top">
+        <div class="avatars">
+          <div class="avatar av-a">C</div>
+          <div class="avatar av-b">B</div>
+        </div>
+        <div>
+          <div class="match-title">Construindo o MVP sem plataforma</div>
+          <div class="match-sub">Registro #002 · esta semana</div>
+        </div>
+      </div>
+      <div class="match-rows">
+        <div class="match-row">
+          <span class="row-icon">🤖</span>
+          <div>
+            <div class="row-main">Bot no Slack como MVP</div>
+            <div class="row-sub">Menos fricção, validação mais rápida</div>
+          </div>
+        </div>
+        <div class="match-row">
+          <span class="row-icon">🎤</span>
+          <div>
+            <div class="row-main">New Journey · founders ao vivo</div>
+            <div class="row-sub">Daniel Lima · Diego Barreto · Guilherme Marra</div>
+          </div>
+        </div>
+        <div class="match-row">
+          <span class="row-icon">💸</span>
+          <div>
+            <div class="row-main">Modelo de monetização em aberto</div>
+            <div class="row-sub">Freemium, patrocínio — ainda indefinido</div>
+          </div>
+        </div>
+      </div>
+      <div class="match-badge">
+        <span class="badge-icon">🎓</span>
+        <div>
+          <div class="badge-main">Horas complementares validadas</div>
+          <div class="badge-sub">Sistema em desenvolvimento · próximo registro</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Todos os registros</p>
+  <div class="editions-wrap">
+    <a class="ed-item" href="#">
+      <span class="ed-num">#001</span>
+      <span class="ed-title">A decisão de sair da caixinha</span>
+      <span class="ed-arrow">↗</span>
+    </a>
+    <a class="ed-item" href="#">
+      <span class="ed-num">#002</span>
+      <span class="ed-title">Bot, eventos e monetização</span>
+      <span class="ed-arrow">↗</span>
+    </a>
+  </div>
+
+  <footer>
+    Construído em público por Cauan &amp; Bruno ·
+    <a href="#">Cancelar inscrição</a>
+  </footer>
+
+</body>
+</html>

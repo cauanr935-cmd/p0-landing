@@ -1,63 +1,685 @@
-<title>Be My Mentor — Diário</title>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Be My Mentor — Mentoria universitária, construída em público</title>
+<meta name="description" content="Be My Mentor (bemymentor) é a rede social universitária de mentoria entre pares. Toda semana Cauan & Bruno contam o que testaram, o que quebrou e o que aprenderam. Leia o diário completo.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="style.css">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="theme-color" content="#f7f5ff">
+<link rel="canonical" href="https://bemymentor.com.br/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
-<div class="wrap">
-  <header class="site">
+<meta property="og:site_name" content="Be My Mentor">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Be My Mentor — Mentoria universitária, construída em público">
+<meta property="og:description" content="Be My Mentor (bemymentor) é a rede social universitária de mentoria entre pares. Toda semana Cauan & Bruno contam o que testaram, o que quebrou e o que aprenderam. Leia o diário completo.">
+<meta property="og:url" content="https://bemymentor.com.br/">
+<meta property="og:image" content="https://bemymentor.com.br/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Be My Mentor — Mentoria universitária, construída em público">
+<meta name="twitter:description" content="Be My Mentor (bemymentor) é a rede social universitária de mentoria entre pares. Toda semana Cauan & Bruno contam o que testaram, o que quebrou e o que aprenderam.">
+<meta name="twitter:image" content="https://bemymentor.com.br/og-image.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://bemymentor.com.br/#organization",
+      "name": "Be My Mentor",
+      "alternateName": ["bemymentor", "BeMyMentor"],
+      "url": "https://bemymentor.com.br/",
+      "logo": "https://bemymentor.com.br/favicon.svg"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://bemymentor.com.br/#website",
+      "url": "https://bemymentor.com.br/",
+      "name": "Be My Mentor",
+      "alternateName": ["bemymentor", "BeMyMentor"],
+      "inLanguage": "pt-BR",
+      "publisher": { "@id": "https://bemymentor.com.br/#organization" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://bemymentor.com.br/#webpage",
+      "url": "https://bemymentor.com.br/",
+      "name": "Be My Mentor — Mentoria universitária, construída em público",
+      "isPartOf": { "@id": "https://bemymentor.com.br/#website" }
+    }
+  ]
+}
+</script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #f7f5ff;
+    --card:     #ffffff;
+    --purple:   #7c3aed;
+    --purple2:  #5b21b6;
+    --text:     #1a0533;
+    --muted:    #9284b3;
+    --border:   #e4dcff;
+  }
+
+  html, body {
+    min-height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1.5px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--purple);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.3; transform:scale(1.5); }
+  }
+
+  .hd-badge {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--purple);
+    color: #fff;
+    padding: 5px 14px;
+    clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+
+  .site-nav {
+    display: flex;
+    gap: 20px;
+  }
+
+  .site-nav a {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .15s ease;
+  }
+
+  .site-nav a:hover,
+  .site-nav a:focus-visible,
+  .site-nav a[aria-current="page"] {
+    color: var(--purple);
+  }
+
+  /* ── PHOTO STRIP ── */
+  .photo-strip {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .photo-strip::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 110px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  .photo-strip-item {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .photo-strip-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-strip-label {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    background: rgba(26, 5, 51, 0.55);
+    backdrop-filter: blur(2px);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .photo-strip { height: 190px; }
+    .photo-strip-label { font-size: 9px; padding: 4px 8px; left: 6px; bottom: 6px; }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 52px 28px 36px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 10vw, 60px);
+    font-weight: 800;
+    line-height: 1.04;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .headline-accent { color: var(--purple); }
+
+  .subline {
+    font-size: 15px;
+    line-height: 1.72;
+    color: var(--muted);
+    margin-bottom: 38px;
+    max-width: 420px;
+  }
+
+  .subline strong { color: var(--text); }
+
+  /* ── BUTTON — convidativo ao toque ──
+     Sombra offset desloca ao hover como se fosse pressionar físico.
+  */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 16px 32px;
+    border: 2.5px solid var(--text);
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: .01em;
+    box-shadow: 5px 5px 0 var(--text);
+    transition: box-shadow .12s ease, transform .12s ease;
+    text-decoration: none;
+    user-select: none;
+  }
+
+  .btn-primary:hover {
+    box-shadow: 8px 8px 0 var(--text);
+    transform: translate(-3px, -3px);
+  }
+
+  .btn-primary:active {
+    box-shadow: 2px 2px 0 var(--text);
+    transform: translate(3px, 3px);
+  }
+
+  .btn-arrow {
+    display: inline-block;
+    transition: transform .2s ease;
+  }
+
+  .btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--purple);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 15px 28px;
+    border: 2.5px solid var(--purple);
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--purple);
+    transition: box-shadow .12s, transform .12s, background .15s, color .15s;
+    text-decoration: none;
+    user-select: none;
+  }
+
+  .btn-secondary:hover {
+    background: var(--purple);
+    color: #fff;
+    box-shadow: 7px 7px 0 var(--purple2);
+    transform: translate(-2px,-2px);
+  }
+
+  .btn-secondary:active {
+    box-shadow: 1px 1px 0 var(--purple2);
+    transform: translate(3px, 3px);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 44px;
+  }
+
+  /* ── STATS ── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    margin-bottom: 52px;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 10px;
+    text-align: center;
+    box-shadow: 3px 3px 0 var(--border);
+  }
+
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--purple);
+    display: block;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding: 0 28px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── MATCH CARD ── */
+  .card-wrap {
+    padding: 0 28px 52px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .match-card {
+    background: var(--text);
+    border-radius: 18px;
+    padding: 24px 20px 20px;
+    border: 2px solid var(--text);
+    box-shadow: 5px 5px 0 var(--purple);
+  }
+
+  .match-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .avatars { display: flex; align-items: center; }
+
+  .avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 3px solid var(--text);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .av-a { background: var(--purple); color: #fff; z-index: 2; }
+  .av-b { background: #fff; color: var(--purple); margin-left: -12px; z-index: 1; }
+
+  .match-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .match-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .match-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+  .match-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,.07);
+    border-radius: 10px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+
+  .row-icon { font-size: 16px; flex-shrink: 0; }
+  .row-main { font-size: 13px; font-weight: 600; color: #fff; }
+  .row-sub  { font-size: 11px; color: var(--muted); }
+
+  .match-badge {
+    background: var(--purple);
+    border-radius: 10px;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1.5px solid rgba(255,255,255,.15);
+  }
+
+  .badge-icon { font-size: 20px; }
+  .badge-main { font-size: 13px; font-weight: 700; color: #fff; }
+  .badge-sub  { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+  /* ── EDITIONS GRID ── */
+  .editions-wrap {
+    padding: 0 28px 28px;
+    max-width: 540px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .ed-item {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 4px 4px 0 var(--border);
+    transition: border-color .15s, box-shadow .12s, transform .12s;
+  }
+
+  .ed-item:hover {
+    border-color: var(--purple);
+    box-shadow: 6px 6px 0 var(--purple);
+    transform: translate(-2px,-2px);
+  }
+
+  .ed-item:active {
+    box-shadow: 1px 1px 0 var(--purple);
+    transform: translate(3px,3px);
+  }
+
+  .ed-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--purple);
+    background: rgba(124,58,237,.1);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    align-self: flex-start;
+  }
+
+  .ed-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  .ed-arrow {
+    font-size: 18px;
+    color: var(--muted);
+    align-self: flex-end;
+    transition: transform .2s;
+  }
+
+  .ed-item:hover .ed-arrow { transform: translate(3px,-3px); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 28px;
+    text-align: center;
+    border-top: 1.5px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  footer a { color: var(--purple); text-decoration: none; }
+
+  /* ── Non-paragraph microcopy: nav, labels, badges, footer ──
+     Paragraph text (.subline, article prose) stays on Inter.
+  */
+  .site-nav a,
+  .eyebrow,
+  .section-label,
+  .stat-lbl,
+  .match-sub,
+  .row-main,
+  .row-sub,
+  .badge-main,
+  .badge-sub,
+  .hd-badge,
+  footer {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  @media (max-width: 380px) {
+    .editions-wrap { grid-template-columns: 1fr; }
+    .hero { padding: 36px 20px 28px; }
+    .card-wrap, .editions-wrap, .section-label { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
     <nav class="site-nav">
-      <a href="index.html" aria-current="page">Diário</a>
+      <a href="diario.html">Diário</a>
       <a href="fundadores.html">Fundadores</a>
     </nav>
-    <a class="site-name" href="index.html">Be My Mentor</a>
+    <a class="logo" href="/">
+      <div class="logo-dot"></div>
+      Be My Mentor
+    </a>
   </header>
 
-  <main>
-    <div class="eyebrow">Atualização · Diário de bordo</div>
-    <h1>Construindo uma rede social universitária em público</h1>
-    <div class="meta">
-      <span>Cauan &amp; Bruno</span>
-      <span class="dot">·</span>
-      <span>Registro nº 1</span>
+  <div class="photo-strip">
+    <div class="photo-strip-item">
+      <img src="assets/brunoBuild.jpeg" alt="Bruno buildando o MVP">
+      <span class="photo-strip-label">Buildando</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/brunoPlanejando.jpeg" alt="Bruno planejando o next steps">
+      <span class="photo-strip-label">Planejando</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/serena.jpeg" alt="Grupo na Quarta no Serena">
+      <span class="photo-strip-label">Serena</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/networkSerena.jpeg" alt="Fazendo network no evento">
+      <span class="photo-strip-label">Network</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/eventoSerena.jpeg" alt="Público no New Journey">
+      <span class="photo-strip-label">Evento</span>
+    </div>
+  </div>
+
+  <section class="hero">
+    <p class="eyebrow">diário de bordo · atualizações semanais</p>
+    <h1 class="headline">
+      Uma startup<br>
+      construída<br>
+      <span class="headline-accent">ao vivo.</span>
+    </h1>
+    <p class="subline">
+      Toda semana, Cauan &amp; Bruno contam o que testaram, o que quebrou
+      e o que aprenderam enquanto constroem
+      <strong>a maior rede social universitária do Brasil</strong>. Sem filtro.
+    </p>
+
+    <div class="btn-row">
+      <a href="diario.html" class="btn-primary">
+        Ler o diário
+        <span class="btn-arrow">→</span>
+      </a>
+      <a href="https://forms.gle/rpsvzo4Q3YHDb65R7" class="btn-secondary" target="_blank" rel="noopener">Responder pesquisa</a>
     </div>
 
-    <article>
-      <h3>A decisão de sair da caixinha</h3>
-      <div class="byline"><span class="avatar">C</span> Cauan</div>
+    <div class="stats-strip">
+      <div class="stat">
+        <span class="stat-num">2</span>
+        <span class="stat-lbl">Registros publicados</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">20+</span>
+        <span class="stat-lbl">Universidades pesquisadas</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">77%</span>
+        <span class="stat-lbl">Queriam falar, não conseguiram</span>
+      </div>
+    </div>
+  </section>
 
-      <p>Demorei 19 anos pra escrever esse texto, mas não sabia que ia escrevê-lo há 3 meses atrás. Foi o período em que empreender deixou de ser uma coisa de filmes e passou a ser uma possibilidade real de futuro. Mas pra isso tive que sair da minha caixinha de um mundo corporativo onde iria trabalhar em empresas renomadas, ter um bom salário e uma vida relativamente confortável. Quando me pergunto por que tomei essa decisão, eu lembro que ter uma vida confortável nunca foi meu principal objetivo, na realidade meu objetivo real era ser lembrado como alguém que construiu algo grande e que causou impacto, assim como muitos jovens assiste à Rede Social e quis empreender assim que terminei de ver o filme.</p>
+  <p class="section-label">✦ Registro mais recente</p>
+  <div class="card-wrap">
+    <div class="match-card">
+      <div class="match-top">
+        <div class="avatars">
+          <div class="avatar av-a"><img src="assets/cauan.jpeg" alt="Cauan"></div>
+          <div class="avatar av-b"><img src="assets/bruno.jpeg" alt="Bruno"></div>
+        </div>
+        <div>
+          <div class="match-title">Construindo o MVP sem plataforma</div>
+          <div class="match-sub">Registro #002 · esta semana</div>
+        </div>
+      </div>
+      <div class="match-rows">
+        <div class="match-row">
+          <span class="row-icon">🤖</span>
+          <div>
+            <div class="row-main">Bot no Slack como MVP</div>
+            <div class="row-sub">Menos fricção, validação mais rápida</div>
+          </div>
+        </div>
+        <div class="match-row">
+          <span class="row-icon">🎤</span>
+          <div>
+            <div class="row-main">New Journey · founders ao vivo</div>
+            <div class="row-sub">Daniel Lima · Diego Barreto · Guilherme Marra</div>
+          </div>
+        </div>
+        <div class="match-row">
+          <span class="row-icon">💸</span>
+          <div>
+            <div class="row-main">Modelo de monetização em aberto</div>
+            <div class="row-sub">Freemium, patrocínio — ainda indefinido</div>
+          </div>
+        </div>
+      </div>
+      <div class="match-badge">
+        <span class="badge-icon">🎓</span>
+        <div>
+          <div class="badge-main">Horas complementares validadas</div>
+          <div class="badge-sub">Sistema em desenvolvimento · próximo registro</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <p>Com o passar do tempo deixei isso de lado. Me adequei a caminhos óbvios e mais seguros, mas acho que foram justamente esses caminhos seguros que me causaram incômodo, a sensação de passar pela vida sem deixar minha marca nela, sem saber se impactei positivamente a vida de muitas pessoas, me causava questionamentos. Em grande parte por isso estou escrevendo esse texto e fazendo o que estou fazendo há três meses: build in public. Gosto desse conceito, por que não? Me chamo Cauan, tenho 19 anos e estou construindo uma rede social universitária. Se isso vai dar certo? Eu não sei, mas vou fazer tudo o que for possível para que sim.</p>
-
-      <div class="byline"><span class="avatar">B</span> Bruno</div>
-
-      <p>Acho que ser founder nunca foi algo que me passou pela cabeça. A verdade é que a realidade é bem distante, lembro-me da época que ser astronauta era o meu único sonho, daí eu queria ser bombeiro, após isso eu quis ser policial e após isso…. Bem, não tem um “após isso”, acho que eu só parei de sonhar por um tempo, era uma época que os adultos haviam me ensinado que chorar e gritar por algo era sinônimo de dar trabalho, e a verdade é que eu não queria dar trabalho, então eu só parei gritar e chorar pelas coisas, não me entenda mal, eu ainda era uma criança, portanto ainda chorava e fazia birra quando no auge do meu egoísmo infantil não conseguia algo que queria, mas eu não sei, sei lá quando penso nessa época, sinto que algo primordial estava morrendo, eu só não sabia, não sentia, talvez a minha inteligência emocional de fundamental I não fosse o suficiente para entender o que estava acontecendo, no entanto, com certeza algo estava acontecendo, não acho ser normal uma criança ganhar um prêmio da professora por ficar em silêncio.</p>
-
-      <p>Honestamente, eu não sei quando essa sensação parou, mas em algum momento parou, o problema era que não era mais como antes, eu não sonhava mais em dominar o espaço ou salvar velhinhas em perigo com o meus tecnológicos lançadores de teia, acho que as pessoas apelidam isso de “amadurecimento” né? Mas o que é amadurecer? Se for para deixar de querer criar uma armadura para descer o cacete no Hulk, então acho que não quero amadurecer. “Ah, mas amadurecer é necessário, você se torna uma pessoa mais respeitável e adequada ao mundo, assim você vai poder ter um emprego estável e uma família linda para chamar de sua”.</p>
-
-      <p>Ahhh…. Sabe, eu nunca pensei em ser founder, mas desde do dia que um indiano veio bater na minha porta dizendo que a achou a chave para a caixinha, eu meio que decidi sair da minha caixa, acontece que eu não sou tão elegante ou respeitoso como ele, então é melhor eu só arrombar logo essa porra mesmo.</p>
-
-      <h3>Sobre a ideia</h3>
-
-      <p>Antes de partir para a ideia, queríamos deixar claro que, antes de chegar a ela, tivemos pelo menos outras 20 que falharam miseravelmente. De certa forma esse é nosso maior sucesso, e olha que nem lançamos o MVP ainda.</p>
-
-      <p>Notamos que os estudantes estão cada vez mais reclusos, talvez como consequência direta da forma como as mídias sociais tradicionais nos estimulam a agir. Fomos entender esse problema mais a fundo e, para isso, rodamos uma pesquisa em mais de 20 universidades do país. Com as respostas que obtivemos até o momento, notamos que aproximadamente 77% dos estudantes universitários relataram que já quiseram falar com alguém no campus e não ter conseguido. Quando perguntamos o motivo, a maioria cita a falta de um pretexto pra iniciar a conversa.</p>
-
-      <p>Com isso, pensamos: por que não criar esse pretexto? Mas não poderia ser apenas um pretexto para conversar, teria que ser também um lugar onde trocas reais acontecem. Foi aí que veio a ideia: podemos criar um espaço onde estudantes com maior facilidade em determinadas matérias ajudam quem tem menos facilidade. Sim, eu sei que isso já existe, a diferença é que essa ajuda é estimulada por uma economia circular, em que ao ajudar com uma mentoria o usuário ganha tempo para receber uma mentoria. Além disso, queremos garantir ao mentor que ele ganhe horas complementares pelo tempo dedicado à aula, que pode ser de 15, 30, 45 minutos ou até uma hora. Unimos o melhor dos dois mundos: pessoas dispostas a ajudar e alunos que precisam desse apoio. E lembra lá do início, quando falamos sobre pretexto? Pra que pretexto melhor do que "me ajuda no conteúdo da prova de amanhã"?</p>
-
-      <p>O que começa com uma mentoria pode virar uma amizade. Muitas coisas ainda estão sendo discutidas, mais atualizações surgirão em breve. Por enquanto, ficamos felizes por estarmos construindo em público.</p>
-
-      <hr class="divider">
-
-      <p class="link-note">Quer ajudar a validar essa ideia? Respondendo <a href="https://forms.gle/rpsvzo4Q3YHDb65R7" target="_blank" rel="noopener">essa pesquisa rápida</a> você contribui diretamente para o que estamos construindo.</p>
-    </article>
-  </main>
+  <p class="section-label">Todos os registros</p>
+  <div class="editions-wrap">
+    <a class="ed-item" href="registro-1.html">
+      <span class="ed-num">#001</span>
+      <span class="ed-title">A decisão de sair da caixinha</span>
+      <span class="ed-arrow">↗</span>
+    </a>
+    <a class="ed-item" href="registro-2.html">
+      <span class="ed-num">#002</span>
+      <span class="ed-title">Bot, eventos e monetização</span>
+      <span class="ed-arrow">↗</span>
+    </a>
+  </div>
 
   <footer>
-    Be My Mentor — construindo em público, um registro por vez.
+    Construído em público por Cauan &amp; Bruno ·
+    <a href="diario.html">Ver diário completo</a>
   </footer>
-</div>
 
-
-
-
-
+</body>
+</html>
