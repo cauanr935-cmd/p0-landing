@@ -454,6 +454,34 @@
   .help-text { font-size: 14px; line-height: 1.6; margin-bottom: 16px; opacity: .8; }
   .help-card .btn-primary { font-size: 14px; padding: 12px 22px; }
 
+  /* ── NEWSLETTER ── */
+  .subscribe-form { display: flex; flex-direction: column; gap: 10px; }
+  .subscribe-form input[type="email"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .subscribe-form input[type="email"]::placeholder { color: var(--muted); opacity: .6; }
+  .subscribe-form input[type="email"]:focus { border-color: var(--purple); }
+  .subscribe-form .btn-primary { justify-content: center; width: 100%; }
+  .subscribe-form .btn-primary:disabled { opacity: .6; cursor: progress; transform: none; }
+  .subscribe-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .subscribe-status { font-size: 13px; line-height: 1.5; min-height: 1.5em; }
+  .subscribe-status[data-kind="success"] { color: var(--purple2); font-weight: 600; }
+  .subscribe-status[data-kind="error"] { color: #b3261e; font-weight: 600; }
+  .subscribe-meta { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
+
   /* ── EDITIONS GRID ── */
   .editions-wrap {
     padding: 0 28px 28px;
@@ -698,10 +726,27 @@
     </div>
   </div>
 
+  <p class="section-label">✦ Receba no seu e-mail</p>
+  <div class="help-wrap">
+    <div class="help-card">
+      <div class="help-title">📬 Newsletter: cada novo registro na sua caixa de entrada</div>
+      <p class="help-text">Toda vez que publicarmos um registro novo, avisamos por e-mail para você acompanhar a construção da Be My Mentor sem precisar voltar aqui.</p>
+      <form class="subscribe-form" novalidate>
+        <label class="sr-only" for="newsletter-email">Seu e-mail</label>
+        <input id="newsletter-email" type="email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn-primary" type="submit">Assinar a newsletter <span class="btn-arrow">→</span></button>
+        <p class="subscribe-status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="subscribe-meta">Gratuito · Sem spam · Cancele quando quiser</p>
+    </div>
+  </div>
+
   <footer>
     Construído em público por Cauan &amp; Bruno ·
     <a href="diario.html">Ver diário completo</a>
   </footer>
 
+  <script src="/subscribe.js" defer></script>
 </body>
 </html>
