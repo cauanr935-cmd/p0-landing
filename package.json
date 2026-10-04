@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node server.js",
     "build": "vite build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js",
+    "send-newsletter": "node scripts/send-newsletter.js"
   },
   "devDependencies": {
     "vite": "^8.3.0"
