@@ -12,6 +12,7 @@ export default defineConfig({
         registro1: resolve(root, 'registro-1.html'),
         registro2: resolve(root, 'registro-2.html'),
         registro3: resolve(root, 'registro-3.html'),
+        registro4: resolve(root, 'registro-4.html'),
         fundadores: resolve(root, 'fundadores.html'),
       },
     },
