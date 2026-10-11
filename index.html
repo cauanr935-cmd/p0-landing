@@ -60,16 +60,6 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:       #f7f5ff;
-    --card:     #ffffff;
-    --purple:   #7c3aed;
-    --purple2:  #5b21b6;
-    --text:     #1a0533;
-    --muted:    #9284b3;
-    --border:   #e4dcff;
-  }
-
   html, body {
     min-height: 100%;
     font-family: 'Inter', sans-serif;
@@ -113,7 +103,7 @@
   .hd-badge {
     font-size: 11px;
     font-weight: 700;
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     padding: 5px 14px;
     clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
@@ -174,9 +164,10 @@
 
   .photo-strip-label {
     position: absolute;
+    z-index: 2;
     left: 10px;
     bottom: 10px;
-    background: rgba(26, 5, 51, 0.55);
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: legenda sobre foto, escura nos dois temas */
     backdrop-filter: blur(2px);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
@@ -238,29 +229,29 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 16px;
     font-weight: 800;
     padding: 16px 32px;
-    border: 2.5px solid var(--text);
+    border: 2.5px solid var(--outline);
     border-radius: 4px;
     cursor: pointer;
     letter-spacing: .01em;
-    box-shadow: 5px 5px 0 var(--text);
+    box-shadow: 5px 5px 0 var(--outline-shadow);
     transition: box-shadow .12s ease, transform .12s ease;
     text-decoration: none;
     user-select: none;
   }
 
   .btn-primary:hover {
-    box-shadow: 8px 8px 0 var(--text);
+    box-shadow: 8px 8px 0 var(--outline-shadow);
     transform: translate(-3px, -3px);
   }
 
   .btn-primary:active {
-    box-shadow: 2px 2px 0 var(--text);
+    box-shadow: 2px 2px 0 var(--outline-shadow);
     transform: translate(3px, 3px);
   }
 
@@ -291,7 +282,7 @@
   }
 
   .btn-secondary:hover {
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     box-shadow: 7px 7px 0 var(--purple2);
     transform: translate(-2px,-2px);
@@ -365,10 +356,10 @@
   }
 
   .match-card {
-    background: var(--text);
+    background: var(--surface-dark);
     border-radius: 18px;
     padding: 24px 20px 20px;
-    border: 2px solid var(--text);
+    border: 2px solid var(--surface-border);
     box-shadow: 5px 5px 0 var(--purple);
   }
 
@@ -384,7 +375,7 @@
   .avatar {
     width: 46px; height: 46px;
     border-radius: 50%;
-    border: 3px solid var(--text);
+    border: 3px solid var(--surface-dark);
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     font-family: 'Space Grotesk', sans-serif;
@@ -399,8 +390,8 @@
     object-fit: cover;
   }
 
-  .av-a { background: var(--purple); color: #fff; z-index: 2; }
-  .av-b { background: #fff; color: var(--purple); margin-left: -12px; z-index: 1; }
+  .av-a { background: var(--btn-bg); color: #fff; z-index: 2; }
+  .av-b { background: #fff; color: var(--btn-bg); margin-left: -12px; z-index: 1; }
 
   .match-title {
     font-family: 'Space Grotesk', sans-serif;
@@ -428,7 +419,7 @@
   .row-sub  { font-size: 11px; color: var(--muted); }
 
   .match-badge {
-    background: var(--purple);
+    background: var(--btn-bg);
     border-radius: 10px;
     padding: 13px 15px;
     display: flex;
@@ -479,7 +470,7 @@
   }
   .subscribe-status { font-size: 13px; line-height: 1.5; min-height: 1.5em; }
   .subscribe-status[data-kind="success"] { color: var(--purple2); font-weight: 600; }
-  .subscribe-status[data-kind="error"] { color: #b3261e; font-weight: 600; }
+  .subscribe-status[data-kind="error"] { color: var(--danger); font-weight: 600; }
   .subscribe-meta { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
 
   /* ── EDITIONS GRID ── */
@@ -522,7 +513,7 @@
     font-size: 11px;
     font-weight: 800;
     color: var(--purple);
-    background: rgba(124,58,237,.1);
+    background: var(--tint);
     display: inline-block;
     padding: 3px 10px;
     border-radius: 3px;

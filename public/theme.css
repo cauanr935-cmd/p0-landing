@@ -1,0 +1,146 @@
+/*
+ * Fonte única dos tokens de cor e do tema escuro.
+ * Injetado automaticamente em TODA página pelo plugin do Vite (vite.config.js),
+ * então páginas novas herdam o tema sem editar nada. Use sempre estes tokens
+ * em vez de cores soltas (#hex / rgb) para a página se adaptar ao escuro.
+ */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f7f5ff;
+  --card: #ffffff;
+  --text: #1a0533;
+  --fg: #1a0533;
+  --muted: #9284b3;
+  --border: #e4dcff;
+  --border-strong: #1a0533;
+
+  --purple: #7c3aed;       /* texto, links, destaques */
+  --purple2: #5b21b6;
+  --btn-bg: #7c3aed;       /* preenchimento com texto branco por cima */
+
+  --outline: #1a0533;      /* contorno de botões e avatares */
+  --outline-shadow: #1a0533; /* sombra offset dos botões */
+  --surface-dark: #1a0533; /* cartões "sempre escuros" (ex.: card do match) */
+  --surface-border: #1a0533;
+  --tint: rgba(124, 58, 237, 0.1);
+  --danger: #b3261e;
+}
+
+/* Escuro: escolha manual (botão) ou, sem escolha, preferência do sistema. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0f0a1a;
+  --card: #1a1228;
+  --text: #ece8f7;
+  --fg: #ece8f7;
+  --muted: #a596c8;
+  --border: #2e2247;
+  --border-strong: #3a2b5c;
+
+  --purple: #a78bfa;
+  --purple2: #c4b5fd;
+  --btn-bg: #7c3aed;
+
+  --outline: #c4b5fd;
+  --outline-shadow: #05010d;
+  --surface-dark: #1f1535;
+  --surface-border: #3a2b5c;
+  --tint: rgba(167, 139, 250, 0.16);
+  --danger: #ff8a80;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #0f0a1a;
+    --card: #1a1228;
+    --text: #ece8f7;
+    --fg: #ece8f7;
+    --muted: #a596c8;
+    --border: #2e2247;
+    --border-strong: #3a2b5c;
+
+    --purple: #a78bfa;
+    --purple2: #c4b5fd;
+    --btn-bg: #7c3aed;
+
+    --outline: #c4b5fd;
+    --outline-shadow: #05010d;
+    --surface-dark: #1f1535;
+    --surface-border: #3a2b5c;
+    --tint: rgba(167, 139, 250, 0.16);
+    --danger: #ff8a80;
+  }
+}
+
+/* Troca suave só depois do primeiro carregamento (classe posta pelo JS). */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-ready body {
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* ── Botão de alternar tema ── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--card);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--purple);
+  box-shadow: 3px 3px 0 var(--purple);
+  transform: translate(-2px, -2px);
+}
+
+.theme-toggle:active {
+  box-shadow: 1px 1px 0 var(--purple);
+  transform: translate(1px, 1px);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Lua no claro (clicar vai para o escuro); sol no escuro. */
+.theme-toggle[data-mode="dark"] .icon-moon,
+.theme-toggle[data-mode="light"] .icon-sun {
+  display: none;
+}
+
+/* No header, canto superior direito, qualquer que seja o layout da página. */
+header > .theme-toggle { margin-left: 14px; }
+header > :is(.logo, .site-name) { margin-left: auto; }
+
+/* Página sem <header>: botão flutuante no canto superior direito. */
+.theme-toggle--floating {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  z-index: 50;
+}

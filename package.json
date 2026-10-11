@@ -7,7 +7,8 @@
     "dev": "node server.js",
     "build": "vite build",
     "start": "NODE_ENV=production node server.js",
-    "send-newsletter": "node scripts/send-newsletter.js"
+    "send-newsletter": "node scripts/send-newsletter.js",
+    "check:theme": "node scripts/check-theme.js"
   },
   "devDependencies": {
     "vite": "^8.3.0"
