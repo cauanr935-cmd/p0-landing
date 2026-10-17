@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Registro nº 5: A primeira mentoria da nossa história | Be My Mentor</title>
-<meta name="description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial e por que estamos validando ligação por ligação antes de lançar.">
+<meta name="description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial, por que estamos validando ligação por ligação antes de lançar, e como o Bruno construiu em casa um transcritor de áudio para as mentorias.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="theme-color" content="#f7f5ff">
@@ -14,14 +14,14 @@
 <meta property="og:locale" content="pt_BR">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Registro nº 5: A primeira mentoria da nossa história">
-<meta property="og:description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial e por que estamos validando ligação por ligação antes de lançar.">
+<meta property="og:description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial, por que estamos validando ligação por ligação antes de lançar, e como o Bruno construiu em casa um transcritor de áudio para as mentorias.">
 <meta property="og:url" content="https://bemymentor.com.br/registro-5.html">
 <meta property="og:image" content="https://bemymentor.com.br/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Registro nº 5: A primeira mentoria da nossa história">
-<meta name="twitter:description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial e por que estamos validando ligação por ligação antes de lançar.">
+<meta name="twitter:description" content="Registro nº 5 do diário da Be My Mentor (bemymentor): como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial, por que estamos validando ligação por ligação antes de lançar, e como o Bruno construiu em casa um transcritor de áudio para as mentorias.">
 <meta name="twitter:image" content="https://bemymentor.com.br/og-image.png">
 
 <link rel="stylesheet" href="style.css">
@@ -64,7 +64,7 @@
         ],
         "publisher": { "@id": "https://bemymentor.com.br/#organization" },
         "image": "https://bemymentor.com.br/og-image.png",
-        "description": "Registro nº 5: como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial e por que estamos validando ligação por ligação antes de lançar."
+        "description": "Registro nº 5: como foi a primeira mentoria conectando um estudante da UFC e uma estudante do Inteli, os próximos passos para mentoria presencial, por que estamos validando ligação por ligação antes de lançar, e como o Bruno construiu em casa um transcritor de áudio para as mentorias."
       }
     ]
   }
@@ -118,7 +118,37 @@
 
       <p>Conversamos com o professor do MIT, que disse: "vamos fazer 10 mentorias, e aí vocês vão ter uma visão melhor antes de colocar o negócio pra rodar de fato". E a gente está com uma afobação muito grande, porque quer colocar isso pra rodar. Mas, cara, a gente precisa martelar mais. Não pode colocar qualquer coisa pra rodar. A gente quer colocar uma parada boa, então precisa achar todos os erros antes de lançar esse negócio. É isso que estamos buscando: achar todos os erros antes de lançar de verdade.</p>
 
-      <p><em>A parte do Bruno nesse registro ainda está sendo produzida. A gente completa assim que estiver pronta.</em></p>
+      <h3>Um transcritor de áudio feito em casa</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Para as mentorias, a gente precisa de um transcritor de áudio. Quem acompanha o build in public já sabe que isso é peça importante do que estamos construindo.</p>
+
+      <p>Comecei procurando o que já existia na internet. As opções ou tinham um limite muito curto, e logo a gente teria que gastar uma grana, ou não tinham qualidade técnica suficiente. Testei uma API num teste de fogo real: transcrever uma conversa entre duas mulheres. Ela falhava, porque tratava as duas como se fossem a mesma pessoa.</p>
+
+      <h3>Por que a IA erra assim</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Isso é um aspecto interessante, porque esses transcritores e analisadores de áudio têm um lado probabilístico, construído em cima de bancos de dados enormes. É o mesmo princípio de como a IA aprende a falar com a gente. Ela leu e viu um monte de conteúdo sobre como a gente fala. Mesmo assim, não fala de forma perfeita, mas se parece bastante. Existe o teste de Turing, em que você coloca uma pessoa conversando com uma máquina sem ela saber o que está do outro lado, e ela tem que adivinhar se é um humano ou uma máquina. Esse teste já foi superado há muito tempo.</p>
+
+      <p>O ponto interessante é que a transcrição analisa uma montanha de conteúdo, e esse conteúdo é produzido por nós, humanos. E nós somos enviesados, por fatores estruturais, socioeconômicos e outros. Quando o conteúdo tinha voz de mulher, ele refletia o machismo estrutural, e as vozes acabavam sem conseguir ser diferenciadas.</p>
+
+      <p>Existe o viés cultural e histórico, e existe também uma parte científica por trás. A faixa de frequência de uma voz masculina é maior. A voz feminina é mais aguda, então tem uma faixa menor. E o ouvido humano tem dificuldade em diferenciar muitos espectros de alta frequência. Eu consigo diferenciar vozes de baixa frequência melhor. Num intervalo de 100 Hz de baixa frequência, eu consigo separar de 0 a 20, de 20 a 40, de 40 a 100. Possivelmente, tá? Na verdade, eu não sei se consigo. Mas quando levo esse mesmo intervalo de 100 Hz para a alta frequência, ele vira um problema.</p>
+
+      <h3>O que eu estou fazendo</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Esse foi o desafio. Então decidi fazer pelo menos uma solução autoral para suprir esse gap, e é nisso que estou trabalhando agora.</p>
+
+      <p>Não vou entrar em detalhes técnicos aqui. Quem quiser a parte técnica pode olhar o vídeo do YouTube sobre o build in public, onde eu explico por cima o começo da transcrição de voz. Futuramente eu falo mais sobre isso.</p>
+
+      <h3>Aprender com IA</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>O que eu quero destacar neste registro é outra coisa. Eu me considero uma pessoa que aprende rápido, sempre aprendi. Mas com a IA isso fica massivo. Eu só falei "quero aprender transcrição de voz" e ela me recomendou uma sequência de vídeos muito boa. A maior parte do material está em inglês, porque transcrição de voz é um assunto difícil de achar aqui no Brasil. Mesmo assim, em pouco tempo, com conteúdo de qualidade, aprender virou um processo mecânico. Eu não precisei caçar em fórum do Reddit, Stack Overflow ou qualquer outro lugar onde vários nerds se reúnem para discutir as melhores fontes. Veio pronto.</p>
+
+      <p>É bizarro como o conhecimento é fácil de adquirir hoje, e isso faz com que saber algo deixe de ser tão diferencial. Aquilo que você sabe agora é muito fácil de aprender, basta dar um prompt. O difícil é ter certeza de que você aprendeu.</p>
+
+      <p>Era isso. Essa foi a minha experiência aprendendo e percebendo os diferentes desafios dentro da transcrição de áudio. Obrigado por ler, ou ouvir, até aqui.</p>
     </article>
 
     <section class="subscribe" aria-labelledby="newsletter-title">
