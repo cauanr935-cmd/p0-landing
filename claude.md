@@ -83,6 +83,8 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 - **Idioma da documentação:** português brasileiro.
 - Toda feature nova deve ter em mente o **fluxo de validação de sessão** e os **requisitos de metadados de certificado** descritos acima.
 - A métrica de sucesso do MVP é **horas de uso semanal dentro da plataforma**, não cadastros.
+- **Dark mode é automático.** O plugin em `vite.config.js` injeta `public/theme.css` (tokens claro/escuro), o script anti-flash e `public/theme-toggle.js` (botão no `<header>`) em **todo `.html`** da raiz, e o build também descobre as páginas sozinho. Página nova (ex.: `registro-5.html`) **não copia nenhum trecho de tema**; basta ter `<header>` (senão o botão fica flutuante) e usar `style.css`.
+- **Cores só por token** (`var(--bg)`, `var(--card)`, `var(--text)`, `var(--purple)`, `var(--btn-bg)`, `var(--outline)`…, definidos em `public/theme.css`), nunca `#hex`/`rgb()` solto, senão a página não se adapta ao escuro. Rode `npm run check:theme` antes do deploy; exceções intencionais levam o comentário `theme-ok`.
 
 ---
 

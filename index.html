@@ -60,16 +60,6 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:       #f7f5ff;
-    --card:     #ffffff;
-    --purple:   #7c3aed;
-    --purple2:  #5b21b6;
-    --text:     #1a0533;
-    --muted:    #9284b3;
-    --border:   #e4dcff;
-  }
-
   html, body {
     min-height: 100%;
     font-family: 'Inter', sans-serif;
@@ -113,7 +103,7 @@
   .hd-badge {
     font-size: 11px;
     font-weight: 700;
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     padding: 5px 14px;
     clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
@@ -146,7 +136,7 @@
     width: 100%;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    background: var(--text);
+    background: var(--surface-dark);
     border-radius: 16px;
     border: 1.5px solid var(--border);
     box-shadow: 4px 4px 0 var(--border);
@@ -162,9 +152,10 @@
 
   .hero-video-label {
     position: absolute;
+    z-index: 2;
     left: 16px;
     bottom: 16px;
-    background: rgba(26, 5, 51, 0.55);
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: legenda sobre vídeo, escura nos dois temas */
     backdrop-filter: blur(2px);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
@@ -179,12 +170,13 @@
 
   .hero-video-sound {
     position: absolute;
+    z-index: 2;
     right: 16px;
     bottom: 16px;
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(26, 5, 51, 0.55);
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: botão sobre vídeo, escuro nos dois temas */
     backdrop-filter: blur(2px);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
@@ -201,7 +193,7 @@
 
   .hero-video-sound:hover,
   .hero-video-sound:focus-visible {
-    background: var(--purple);
+    background: var(--btn-bg);
   }
 
   @media (max-width: 640px) {
@@ -253,29 +245,29 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 16px;
     font-weight: 800;
     padding: 16px 32px;
-    border: 2.5px solid var(--text);
+    border: 2.5px solid var(--outline);
     border-radius: 4px;
     cursor: pointer;
     letter-spacing: .01em;
-    box-shadow: 5px 5px 0 var(--text);
+    box-shadow: 5px 5px 0 var(--outline-shadow);
     transition: box-shadow .12s ease, transform .12s ease;
     text-decoration: none;
     user-select: none;
   }
 
   .btn-primary:hover {
-    box-shadow: 8px 8px 0 var(--text);
+    box-shadow: 8px 8px 0 var(--outline-shadow);
     transform: translate(-3px, -3px);
   }
 
   .btn-primary:active {
-    box-shadow: 2px 2px 0 var(--text);
+    box-shadow: 2px 2px 0 var(--outline-shadow);
     transform: translate(3px, 3px);
   }
 
@@ -306,7 +298,7 @@
   }
 
   .btn-secondary:hover {
-    background: var(--purple);
+    background: var(--btn-bg);
     color: #fff;
     box-shadow: 7px 7px 0 var(--purple2);
     transform: translate(-2px,-2px);
@@ -380,10 +372,10 @@
   }
 
   .match-card {
-    background: var(--text);
+    background: var(--surface-dark);
     border-radius: 18px;
     padding: 24px 20px 20px;
-    border: 2px solid var(--text);
+    border: 2px solid var(--surface-border);
     box-shadow: 5px 5px 0 var(--purple);
   }
 
@@ -399,7 +391,7 @@
   .avatar {
     width: 46px; height: 46px;
     border-radius: 50%;
-    border: 3px solid var(--text);
+    border: 3px solid var(--surface-dark);
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     font-family: 'Space Grotesk', sans-serif;
@@ -414,8 +406,8 @@
     object-fit: cover;
   }
 
-  .av-a { background: var(--purple); color: #fff; z-index: 2; }
-  .av-b { background: #fff; color: var(--purple); margin-left: -12px; z-index: 1; }
+  .av-a { background: var(--btn-bg); color: #fff; z-index: 2; }
+  .av-b { background: #fff; color: var(--btn-bg); margin-left: -12px; z-index: 1; }
 
   .match-title {
     font-family: 'Space Grotesk', sans-serif;
@@ -443,7 +435,7 @@
   .row-sub  { font-size: 11px; color: var(--muted); }
 
   .match-badge {
-    background: var(--purple);
+    background: var(--btn-bg);
     border-radius: 10px;
     padding: 13px 15px;
     display: flex;
@@ -468,6 +460,34 @@
   .help-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
   .help-text { font-size: 14px; line-height: 1.6; margin-bottom: 16px; opacity: .8; }
   .help-card .btn-primary { font-size: 14px; padding: 12px 22px; }
+
+  /* ── NEWSLETTER ── */
+  .subscribe-form { display: flex; flex-direction: column; gap: 10px; }
+  .subscribe-form input[type="email"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .subscribe-form input[type="email"]::placeholder { color: var(--muted); opacity: .6; }
+  .subscribe-form input[type="email"]:focus { border-color: var(--purple); }
+  .subscribe-form .btn-primary { justify-content: center; width: 100%; }
+  .subscribe-form .btn-primary:disabled { opacity: .6; cursor: progress; transform: none; }
+  .subscribe-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .subscribe-status { font-size: 13px; line-height: 1.5; min-height: 1.5em; }
+  .subscribe-status[data-kind="success"] { color: var(--purple2); font-weight: 600; }
+  .subscribe-status[data-kind="error"] { color: var(--danger); font-weight: 600; }
+  .subscribe-meta { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
 
   /* ── EDITIONS GRID ── */
   .editions-wrap {
@@ -509,7 +529,7 @@
     font-size: 11px;
     font-weight: 800;
     color: var(--purple);
-    background: rgba(124,58,237,.1);
+    background: var(--tint);
     display: inline-block;
     padding: 3px 10px;
     border-radius: 3px;
@@ -711,11 +731,28 @@
     </div>
   </div>
 
+  <p class="section-label">✦ Receba no seu e-mail</p>
+  <div class="help-wrap">
+    <div class="help-card">
+      <div class="help-title">📬 Newsletter: cada novo registro na sua caixa de entrada</div>
+      <p class="help-text">Toda vez que publicarmos um registro novo, avisamos por e-mail para você acompanhar a construção da Be My Mentor sem precisar voltar aqui.</p>
+      <form class="subscribe-form" novalidate>
+        <label class="sr-only" for="newsletter-email">Seu e-mail</label>
+        <input id="newsletter-email" type="email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn-primary" type="submit">Assinar a newsletter <span class="btn-arrow">→</span></button>
+        <p class="subscribe-status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="subscribe-meta">Gratuito · Sem spam · Cancele quando quiser</p>
+    </div>
+  </div>
+
   <footer>
     Construído em público por Cauan &amp; Bruno ·
     <a href="diario.html">Ver diário completo</a>
   </footer>
 
+  <script src="/subscribe.js" defer></script>
   <script>
     (function () {
       var video = document.getElementById('heroVideo');
@@ -736,6 +773,5 @@
       });
     })();
   </script>
-
 </body>
 </html>
