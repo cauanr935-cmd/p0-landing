@@ -130,6 +130,61 @@
     color: var(--purple);
   }
 
+  /* ── PHOTO STRIP ── */
+  .photo-strip {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .photo-strip::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 110px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  .photo-strip-item {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .photo-strip-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-strip-label {
+    position: absolute;
+    z-index: 2;
+    left: 10px;
+    bottom: 10px;
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: legenda sobre foto, escura nos dois temas */
+    backdrop-filter: blur(2px);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .photo-strip { height: 190px; }
+    .photo-strip-label { font-size: 9px; padding: 4px 8px; left: 6px; bottom: 6px; }
+  }
+
   /* ── HERO VIDEO ── */
   .hero-video-wrap {
     position: relative;
@@ -597,12 +652,36 @@
     <nav class="site-nav">
       <a href="diario.html">Diário</a>
       <a href="fundadores.html">Fundadores</a>
+      <a href="redes.html">Nas redes</a>
     </nav>
     <a class="logo" href="/">
       <div class="logo-dot"></div>
       Be My Mentor
     </a>
   </header>
+
+  <div class="photo-strip">
+    <div class="photo-strip-item">
+      <img src="assets/brunoBuild.jpeg" alt="Bruno buildando o MVP">
+      <span class="photo-strip-label">Buildando</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/brunoPlanejando.jpeg" alt="Bruno planejando o next steps">
+      <span class="photo-strip-label">Planejando</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/serena.jpeg" alt="Grupo na Quarta no Serena">
+      <span class="photo-strip-label">Serena</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/networkSerena.jpeg" alt="Fazendo network no evento">
+      <span class="photo-strip-label">Network</span>
+    </div>
+    <div class="photo-strip-item">
+      <img src="assets/eventoSerena.jpeg" alt="Público no New Journey">
+      <span class="photo-strip-label">Evento</span>
+    </div>
+  </div>
 
   <section class="hero">
     <p class="eyebrow">diário de bordo · atualizações semanais</p>
@@ -638,7 +717,7 @@
 
     <div class="stats-strip">
       <div class="stat">
-        <span class="stat-num">4</span>
+        <span class="stat-num">5</span>
         <span class="stat-lbl">Registros publicados</span>
       </div>
       <div class="stat">
@@ -718,6 +797,11 @@
     <a class="ed-item" href="registro-4.html">
       <span class="ed-num">#004</span>
       <span class="ed-title">Faculdade, startup e build in public, tudo ao mesmo tempo</span>
+      <span class="ed-arrow">↗</span>
+    </a>
+    <a class="ed-item" href="registro-5.html">
+      <span class="ed-num">#005</span>
+      <span class="ed-title">A primeira mentoria da nossa história</span>
       <span class="ed-arrow">↗</span>
     </a>
   </div>
