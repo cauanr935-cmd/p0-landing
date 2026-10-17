@@ -130,44 +130,32 @@
     color: var(--purple);
   }
 
-  /* ── PHOTO STRIP ── */
-  .photo-strip {
+  /* ── HERO VIDEO ── */
+  .hero-video-wrap {
     position: relative;
-    display: flex;
     width: 100%;
-    height: 300px;
+    aspect-ratio: 16 / 10;
     overflow: hidden;
+    background: var(--surface-dark);
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
+    box-shadow: 4px 4px 0 var(--border);
+    margin-bottom: 38px;
   }
 
-  .photo-strip::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 110px;
-    background: linear-gradient(to bottom, transparent, var(--bg));
-    pointer-events: none;
-  }
-
-  .photo-strip-item {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .photo-strip-item img {
+  .hero-video {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .photo-strip-label {
+  .hero-video-label {
     position: absolute;
     z-index: 2;
-    left: 10px;
-    bottom: 10px;
-    background: rgba(26, 5, 51, 0.55); /* theme-ok: legenda sobre foto, escura nos dois temas */
+    left: 16px;
+    bottom: 16px;
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: legenda sobre vídeo, escura nos dois temas */
     backdrop-filter: blur(2px);
     color: #fff;
     font-family: 'Space Grotesk', sans-serif;
@@ -180,9 +168,37 @@
     white-space: nowrap;
   }
 
+  .hero-video-sound {
+    position: absolute;
+    z-index: 2;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(26, 5, 51, 0.55); /* theme-ok: botão sobre vídeo, escuro nos dois temas */
+    backdrop-filter: blur(2px);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+
+  .hero-video-sound:hover,
+  .hero-video-sound:focus-visible {
+    background: var(--btn-bg);
+  }
+
   @media (max-width: 640px) {
-    .photo-strip { height: 190px; }
-    .photo-strip-label { font-size: 9px; padding: 4px 8px; left: 6px; bottom: 6px; }
+    .hero-video-label,
+    .hero-video-sound { font-size: 9px; padding: 5px 9px; left: 8px; right: 8px; bottom: 8px; }
   }
 
   /* ── HERO ── */
@@ -588,29 +604,6 @@
     </a>
   </header>
 
-  <div class="photo-strip">
-    <div class="photo-strip-item">
-      <img src="assets/brunoBuild.jpeg" alt="Bruno buildando o MVP">
-      <span class="photo-strip-label">Buildando</span>
-    </div>
-    <div class="photo-strip-item">
-      <img src="assets/brunoPlanejando.jpeg" alt="Bruno planejando o next steps">
-      <span class="photo-strip-label">Planejando</span>
-    </div>
-    <div class="photo-strip-item">
-      <img src="assets/serena.jpeg" alt="Grupo na Quarta no Serena">
-      <span class="photo-strip-label">Serena</span>
-    </div>
-    <div class="photo-strip-item">
-      <img src="assets/networkSerena.jpeg" alt="Fazendo network no evento">
-      <span class="photo-strip-label">Network</span>
-    </div>
-    <div class="photo-strip-item">
-      <img src="assets/eventoSerena.jpeg" alt="Público no New Journey">
-      <span class="photo-strip-label">Evento</span>
-    </div>
-  </div>
-
   <section class="hero">
     <p class="eyebrow">diário de bordo · atualizações semanais</p>
     <h1 class="headline">
@@ -623,6 +616,17 @@
       e o que aprenderam enquanto constroem
       <strong>a maior rede social universitária do Brasil</strong>. Sem filtro.
     </p>
+
+    <div class="hero-video-wrap">
+      <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto">
+        <source src="assets/be_my_mentor_v2.mp4" type="video/mp4">
+      </video>
+      <span class="hero-video-label">Build in public</span>
+      <button class="hero-video-sound" id="heroVideoSound" type="button" aria-pressed="false">
+        <span id="heroVideoSoundIcon" aria-hidden="true">🔇</span>
+        <span id="heroVideoSoundText">Ativar som</span>
+      </button>
+    </div>
 
     <div class="btn-row">
       <a href="diario.html" class="btn-primary">
@@ -657,38 +661,38 @@
           <div class="avatar av-b"><img src="assets/bruno.jpeg" alt="Bruno"></div>
         </div>
         <div>
-          <div class="match-title">Construindo o MVP sem plataforma</div>
-          <div class="match-sub">Registro #002 · esta semana</div>
+          <div class="match-title">Faculdade, startup e build in public, tudo ao mesmo tempo</div>
+          <div class="match-sub">Registro #004 · mais recente</div>
         </div>
       </div>
       <div class="match-rows">
         <div class="match-row">
-          <span class="row-icon">🤖</span>
+          <span class="row-icon">📚</span>
           <div>
-            <div class="row-main">Bot no Slack como MVP</div>
-            <div class="row-sub">Menos fricção, validação mais rápida</div>
+            <div class="row-main">Prova do módulo e startup, ao mesmo tempo</div>
+            <div class="row-sub">Bolsa em jogo, ~5h de reunião por dia</div>
           </div>
         </div>
         <div class="match-row">
-          <span class="row-icon">🎤</span>
+          <span class="row-icon">💬</span>
           <div>
-            <div class="row-main">New Journey · founders ao vivo</div>
-            <div class="row-sub">Daniel Lima · Diego Barreto · Guilherme Marra</div>
+            <div class="row-main">15 mensagens no LinkedIn, zero calls</div>
+            <div class="row-sub">Contato pessoal funcionou muito melhor</div>
           </div>
         </div>
         <div class="match-row">
-          <span class="row-icon">💸</span>
+          <span class="row-icon">🎥</span>
           <div>
-            <div class="row-main">Modelo de monetização em aberto</div>
-            <div class="row-sub">Freemium, patrocínio — ainda indefinido</div>
+            <div class="row-main">Bastidores no YouTube</div>
+            <div class="row-sub">A rotina caótica, sem filtro</div>
           </div>
         </div>
       </div>
       <div class="match-badge">
-        <span class="badge-icon">🎓</span>
+        <span class="badge-icon">🚀</span>
         <div>
-          <div class="badge-main">Horas complementares validadas</div>
-          <div class="badge-sub">Sistema em desenvolvimento · próximo registro</div>
+          <div class="badge-main">MVP sem todo o arcabouço de negócio</div>
+          <div class="badge-sub">Decisão consciente · próximo registro</div>
         </div>
       </div>
     </div>
@@ -749,5 +753,25 @@
   </footer>
 
   <script src="/subscribe.js" defer></script>
+  <script>
+    (function () {
+      var video = document.getElementById('heroVideo');
+      var btn = document.getElementById('heroVideoSound');
+      var icon = document.getElementById('heroVideoSoundIcon');
+      var text = document.getElementById('heroVideoSoundText');
+      if (!video || !btn) return;
+
+      btn.addEventListener('click', function () {
+        video.muted = !video.muted;
+        if (!video.muted) {
+          video.play().catch(function () { video.muted = true; });
+        }
+        var on = !video.muted;
+        btn.setAttribute('aria-pressed', String(on));
+        icon.textContent = on ? '🔊' : '🔇';
+        text.textContent = on ? 'Desativar som' : 'Ativar som';
+      });
+    })();
+  </script>
 </body>
 </html>
