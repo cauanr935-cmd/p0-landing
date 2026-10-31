@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Registro nº 6: O software não é o nosso diferencial | Be My Mentor</title>
-<meta name="description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor.">
+<meta name="description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor, e como o Bruno terminou o transcritor de áudio com WhisperX.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="theme-color" content="#f7f5ff">
@@ -14,14 +14,14 @@
 <meta property="og:locale" content="pt_BR">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Registro nº 6: O software não é o nosso diferencial">
-<meta property="og:description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor.">
+<meta property="og:description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor, e como o Bruno terminou o transcritor de áudio com WhisperX.">
 <meta property="og:url" content="https://bemymentor.com.br/registro-6.html">
 <meta property="og:image" content="https://bemymentor.com.br/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Registro nº 6: O software não é o nosso diferencial">
-<meta name="twitter:description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor.">
+<meta name="twitter:description" content="Registro nº 6 do diário da Be My Mentor (bemymentor): o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor, e como o Bruno terminou o transcritor de áudio com WhisperX.">
 <meta name="twitter:image" content="https://bemymentor.com.br/og-image.png">
 
 <link rel="stylesheet" href="style.css">
@@ -59,11 +59,12 @@
         "mainEntityOfPage": "https://bemymentor.com.br/registro-6.html",
         "isPartOf": { "@id": "https://bemymentor.com.br/#website" },
         "author": [
-          { "@type": "Person", "name": "Cauan" }
+          { "@type": "Person", "name": "Cauan" },
+          { "@type": "Person", "name": "Bruno" }
         ],
         "publisher": { "@id": "https://bemymentor.com.br/#organization" },
         "image": "https://bemymentor.com.br/og-image.png",
-        "description": "Registro nº 6: o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor."
+        "description": "Registro nº 6: o que o Cauan aprendeu sobre empreendedorismo nas palestras da 202, por que software deixou de ser diferencial na era da IA e por que a nossa barreira de entrada será a rede de pessoas e a percepção de valor, e como o Bruno terminou o transcritor de áudio com WhisperX."
       }
     ]
   }
@@ -84,7 +85,7 @@
     <div class="eyebrow">Atualização · Registro nº 6</div>
     <h1>O software não é o nosso diferencial</h1>
     <div class="meta">
-      <span>Cauan</span>
+      <span>Cauan e Bruno</span>
       <span class="dot">·</span>
       <span>Registro nº 6</span>
     </div>
@@ -124,6 +125,33 @@
       <p>Óbvio que a gente quer fazer dinheiro, mas existe um propósito muito grande por trás: conectar pessoas. Num momento em que a maioria está imersa em redes sociais tradicionais, como Instagram e TikTok, a gente quer ser um contrapeso e mostrar que existe vida além delas, e como dá para se conectar presencialmente com outras pessoas. Isso é assunto para um próximo build in public, mas já fica o gostinho.</p>
 
       <p>Durante muito tempo a gente pensou em como seria a nossa barreira de entrada. O software não é ela, e a forma como vamos monetizar também não. A nossa maior barreira vai ser a relação que a gente constrói com as pessoas e a percepção que outros estudantes vão ter da rede. É em cima disso que a gente vai trabalhar. Escutar isso numa palestra foi um daqueles pequenos momentos que ajudam muito, e a gente tem bastante margem para evoluir.</p>
+
+      <h3>O transcritor de áudio está pronto</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Olá, pessoal! Da minha parte, consegui terminar o transcritor de áudio. Não sei se vamos fazer um vídeo sobre a parte técnica, então segue um mini briefing.</p>
+
+      <p>Comecei a estudar bastante os sistemas de speech-to-text e percebi que fazer um sistema totalmente autoral é uma má ideia. É preciso uma base de dados forte para treinar o modelo probabilístico a separar os fonemas e entender quais serão as próximas palavras e frases. E, como toda base de dados, uma base de voz está sujeita a vieses. Criar tudo do zero e ainda tentar tirar todos esses vieses seria complicado.</p>
+
+      <p>Então peguei uma base e alguns módulos prontos. O Whisper, módulo de transcrição de voz da OpenAI, tem uma versão paga, em que você paga pelo que é transcrito, e uma versão local, o WhisperX. É o que estamos usando, junto com o Pyannote, uma biblioteca Python que auxilia na transcrição. Ainda vou testar o sistema, então no próximo registro vocês devem saber se deu bom, se deu ruim ou se eu fracassei miseravelmente.</p>
+
+      <h3>Rumo às 10 mentorias</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Fora isso, estamos bastante na fase de testar o piloto e fazer mentorias. A meta é fazer cerca de 10 mentorias antes de lançar oficialmente a Be My Mentor como plataforma integrada ao Omni App. Ainda estamos decidindo se vamos integrar com o Slack ou com o WhatsApp. O foco agora é fazer o match entre mentores e mentorados.</p>
+
+      <p>O Cauan está despirocando nisso e já conseguiu uma porrada de mentorias. Todo dia ele me fala que conversou com mais alguém e que tem call marcada para amanhã. Enquanto isso, eu fico aqui no sistema de transcrição de voz. Mas consegui converter dois mentores, e faltam alguns mentorados para eles.</p>
+
+      <p>Fica o convite: se você tem interesse em ser mentor ou mentorado, manda um zap. Vocês provavelmente têm o nosso contato, a gente sempre compartilha o build in public nos grupos do Inteli e por aí. Qualquer dúvida, chega na gente que a gente dá um jeito.</p>
+
+      <h3>Pequenos bons hábitos</h3>
+      <div class="byline"><span class="avatar"><img src="assets/bruno.jpeg" alt="Bruno"></span> Bruno</div>
+
+      <p>Além disso, comecei a academia. É meio bizarro, porque agora faço tudo em prol dela. Para crescer, você precisa dormir e comer bem, e como não quero que todo o sofrimento da academia vá para o lixo, me obrigo a isso. Isso está me consertando pouco a pouco. Pequenos bons hábitos vão gerando outros, e assim você vai melhorando cada vez mais.</p>
+
+      <p>Estou pensando em fazer um text-to-speech da newsletter, para vocês escutarem no ônibus em vez de só ler. Apesar de que acho meio egocêntrico pensar que vocês realmente fariam isso.</p>
+
+      <p>Muito obrigado por me escutar, ou me ler, até aqui. Meu nome é Bruno, CTO, CFO e outros C-levels dessa bagaça. Tamo junto e até o próximo registro do build in public. Valeu!</p>
     </article>
 
     <section class="subscribe" aria-labelledby="newsletter-title">
