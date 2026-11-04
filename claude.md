@@ -86,6 +86,13 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 - **Dark mode é automático.** O plugin em `vite.config.js` injeta `public/theme.css` (tokens claro/escuro), o script anti-flash e `public/theme-toggle.js` (botão no `<header>`) em **todo `.html`** da raiz, e o build também descobre as páginas sozinho. Página nova (ex.: `registro-5.html`) **não copia nenhum trecho de tema**; basta ter `<header>` (senão o botão fica flutuante) e usar `style.css`.
 - **Cores só por token** (`var(--bg)`, `var(--card)`, `var(--text)`, `var(--purple)`, `var(--btn-bg)`, `var(--outline)`…, definidos em `public/theme.css`), nunca `#hex`/`rgb()` solto, senão a página não se adapta ao escuro. Rode `npm run check:theme` antes do deploy; exceções intencionais levam o comentário `theme-ok`.
 
+## Home: linha do tempo em ilhas
+
+- A home (`index.html`) é **sempre escura**, de propósito: usa os tokens `--stage-*` de `public/theme.css` e esconde o botão de tema.
+- A linha do tempo vem de `public/data/conteudos.json`, em ordem cronológica (mais antigo primeiro). Tipos de ilha: `conteudo` (vídeo + números), `decisao` (frase grande), `marco` e `registro`. Números desconhecidos ficam `null` e aparecem como "—".
+- Prévias dos vídeos: `scripts/make-previews.sh <video> <id> <inicio> [duracao]` gera `public/previews/<id>.mp4` (mudo, leve, em loop) e `<id>.jpg`. Depois preencha `previa` e `capa` no JSON.
+- Registro novo: além da página `registro-N.html`, adicione a ilha no JSON e a linha na lista "Todos os registros" da home.
+
 ---
 
 *Be My Mentor · Inteli, São Paulo · 2026*

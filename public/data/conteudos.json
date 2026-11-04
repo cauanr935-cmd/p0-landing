@@ -1,0 +1,183 @@
+{
+  "_como_editar": "Ordem cronológica: do mais antigo para o mais recente. Tipos: conteudo (vídeo com números), decisao (texto grande), marco (momento em que algo começou) e registro (edição do diário). Números desconhecidos ficam null e aparecem como '—'. 'data_confirmar': true marca datas que ainda precisam ser conferidas. Prévias: rode scripts/make-previews.sh e preencha 'previa' e 'capa'.",
+  "inicio_publico": "2026-09-23",
+  "itens": [
+    {
+      "id": "registro-001",
+      "tipo": "marco",
+      "data": "2026-09-23",
+      "rotulo": "Dia 1 em público",
+      "titulo": "A decisão de sair da caixinha",
+      "texto": "Publicamos o primeiro registro e colocamos o site no ar. A partir daqui, tudo passa a ser contado.",
+      "link": "registro-1.html",
+      "link_rotulo": "Ler o registro #001"
+    },
+    {
+      "id": "registro-002",
+      "tipo": "registro",
+      "data": "2026-09-23",
+      "numero": "#002",
+      "titulo": "Bot, eventos e monetização",
+      "link": "registro-2.html"
+    },
+    {
+      "id": "registro-003",
+      "tipo": "registro",
+      "data": "2026-10-03",
+      "numero": "#003",
+      "titulo": "Abrindo a caixa-preta: o que decidimos essa semana",
+      "link": "registro-3.html"
+    },
+    {
+      "id": "yt-building-01",
+      "tipo": "conteudo",
+      "data": "2026-10-08",
+      "data_confirmar": true,
+      "plataforma": "youtube",
+      "formato": "horizontal",
+      "titulo": "Building a startup #01",
+      "capa": "https://i.ytimg.com/vi/VY2pT_00GNI/hqdefault.jpg",
+      "previa": null,
+      "link": "https://youtu.be/VY2pT_00GNI",
+      "veredito": null,
+      "metricas": { "views": null, "curtidas": null, "comentarios": null },
+      "aprendizado": null
+    },
+    {
+      "id": "decisao-shorts-animados",
+      "tipo": "decisao",
+      "data": "2026-10-09",
+      "data_confirmar": true,
+      "veredito": "erro",
+      "frase": "Os primeiros Shorts eram corte seco. Refizemos todos animados.",
+      "contexto": "Cada fala de impacto virou animação, som e legenda palavra por palavra."
+    },
+    {
+      "id": "registro-004",
+      "tipo": "registro",
+      "data": "2026-10-10",
+      "numero": "#004",
+      "titulo": "Faculdade, startup e build in public, tudo ao mesmo tempo",
+      "link": "registro-4.html"
+    },
+    {
+      "id": "registro-005",
+      "tipo": "marco",
+      "data": "2026-10-17",
+      "rotulo": "Primeira mentoria",
+      "titulo": "A primeira mentoria da nossa história",
+      "texto": "Um mentor, uma mentorada e a prova de que a ideia funciona fora do slide.",
+      "link": "registro-5.html",
+      "link_rotulo": "Ler o registro #005"
+    },
+    {
+      "id": "yt-building-02",
+      "tipo": "conteudo",
+      "data": "2026-10-18",
+      "data_confirmar": true,
+      "plataforma": "youtube",
+      "formato": "horizontal",
+      "titulo": "Building a startup #02",
+      "capa": "https://i.ytimg.com/vi/FcmoHK_tdRg/hqdefault.jpg",
+      "previa": null,
+      "link": "https://youtu.be/FcmoHK_tdRg",
+      "veredito": null,
+      "metricas": { "views": null, "curtidas": null, "comentarios": null },
+      "aprendizado": null
+    },
+    {
+      "id": "decisao-musica",
+      "tipo": "decisao",
+      "data": "2026-10-19",
+      "data_confirmar": true,
+      "veredito": "erro",
+      "frase": "Usamos uma música famosa no EP01. O YouTube bloqueou o vídeo em alguns países.",
+      "contexto": "Desde então, trilha comercial só com versão alternativa pronta."
+    },
+    {
+      "id": "ig-ep01-main",
+      "tipo": "conteudo",
+      "data": "2026-10-22",
+      "data_confirmar": true,
+      "plataforma": "instagram",
+      "formato": "vertical",
+      "titulo": "EP 01 · Já subiu pra main?",
+      "capa": null,
+      "previa": null,
+      "link": null,
+      "veredito": "teste",
+      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "aprendizado": "Primeiro episódio animado da série: uma história de perrengue que todo aluno do Inteli já viveu."
+    },
+    {
+      "id": "registro-006",
+      "tipo": "registro",
+      "data": "2026-10-24",
+      "numero": "#006",
+      "titulo": "O software não é o nosso diferencial",
+      "link": "registro-6.html"
+    },
+    {
+      "id": "ig-ep02-tasks",
+      "tipo": "conteudo",
+      "data": "2026-10-28",
+      "data_confirmar": true,
+      "plataforma": "instagram",
+      "formato": "vertical",
+      "titulo": "EP 02 · Gestão inteligente de tasks",
+      "capa": null,
+      "previa": null,
+      "link": null,
+      "veredito": "teste",
+      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "aprendizado": null
+    },
+    {
+      "id": "registro-007",
+      "tipo": "decisao",
+      "data": "2026-10-31",
+      "veredito": "decisao",
+      "frase": "Ainda não é hora de abrir para todo mundo.",
+      "contexto": "Reputação vale mais que pressa. Registro #007.",
+      "link": "registro-7.html"
+    },
+    {
+      "id": "decisao-estilo",
+      "tipo": "decisao",
+      "data": "2026-11-01",
+      "data_confirmar": true,
+      "veredito": "acerto",
+      "frase": "“Se as pessoas não riem, cadê o nosso estilo?”",
+      "contexto": "O feedback que tirou os cortes do podcast do plano parado e trouxe close, figurinha e som de meme."
+    },
+    {
+      "id": "ig-podcast-mvp",
+      "tipo": "conteudo",
+      "data": "2026-11-02",
+      "data_confirmar": true,
+      "plataforma": "instagram",
+      "formato": "vertical",
+      "titulo": "Podcast · O MVP morreu?",
+      "capa": null,
+      "previa": null,
+      "link": null,
+      "veredito": null,
+      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "aprendizado": null
+    },
+    {
+      "id": "yt-building-03",
+      "tipo": "conteudo",
+      "data": "2026-11-03",
+      "plataforma": "youtube",
+      "formato": "horizontal",
+      "titulo": "Building a startup #03",
+      "capa": null,
+      "previa": null,
+      "link": null,
+      "veredito": null,
+      "metricas": { "views": null, "curtidas": null, "comentarios": null },
+      "aprendizado": "Cinco versões do mesmo episódio em um dia."
+    }
+  ]
+}

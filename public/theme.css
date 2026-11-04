@@ -77,6 +77,24 @@
   }
 }
 
+/*
+ * Palco: superfícies "sempre escuras" da home (linha do tempo em ilhas).
+ * Não mudam com o tema, de propósito: a home é escura nos dois modos.
+ */
+:root {
+  --stage-bg: #07050d;
+  --stage-island: #120d1e;
+  --stage-island-2: #19122a;
+  --stage-line: #2a2040;
+  --stage-text: #f3f0fb;
+  --stage-muted: #8f84a8;
+  --stage-glow: rgba(167, 139, 250, 0.28);
+  --stage-accent: #a78bfa;
+  --stage-ok: #5ee0a0;
+  --stage-fail: #ff7a8a;
+  --stage-test: #ffd166;
+}
+
 /* Troca suave só depois do primeiro carregamento (classe posta pelo JS). */
 @media (prefers-reduced-motion: no-preference) {
   html.theme-ready body {
