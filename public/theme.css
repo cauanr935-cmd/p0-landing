@@ -93,6 +93,13 @@
   --stage-ok: #5ee0a0;
   --stage-fail: #ff7a8a;
   --stage-test: #ffd166;
+
+  /* Papel do diário 3D (legendas e tiras) */
+  --paper: #f4efe3;
+  --ink: #1d2a5a;
+  --ink-red: #d2372b;
+  --ink-green: #1f8a4c;
+  --grid: rgba(70, 120, 190, 0.18);
 }
 
 /* Troca suave só depois do primeiro carregamento (classe posta pelo JS). */

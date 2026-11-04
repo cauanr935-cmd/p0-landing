@@ -86,13 +86,20 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 - **Dark mode é automático.** O plugin em `vite.config.js` injeta `public/theme.css` (tokens claro/escuro), o script anti-flash e `public/theme-toggle.js` (botão no `<header>`) em **todo `.html`** da raiz, e o build também descobre as páginas sozinho. Página nova (ex.: `registro-5.html`) **não copia nenhum trecho de tema**; basta ter `<header>` (senão o botão fica flutuante) e usar `style.css`.
 - **Cores só por token** (`var(--bg)`, `var(--card)`, `var(--text)`, `var(--purple)`, `var(--btn-bg)`, `var(--outline)`…, definidos em `public/theme.css`), nunca `#hex`/`rgb()` solto, senão a página não se adapta ao escuro. Rode `npm run check:theme` antes do deploy; exceções intencionais levam o comentário `theme-ok`.
 
-## Home: linha do tempo em ilhas
+## Home 3D: o diário de bordo em papel
 
-- A home (`index.html`) é **sempre escura**, de propósito: usa os tokens `--stage-*` de `public/theme.css` e esconde o botão de tema.
-- A linha do tempo vem de `public/data/conteudos.json`, em ordem cronológica (mais antigo primeiro). Tipos de ilha: `conteudo` (vídeo + números), `decisao` (frase grande), `marco` e `registro`. Números desconhecidos ficam `null` e aparecem como "—".
-- Prévias dos vídeos: `scripts/make-previews.sh <video> <id> <inicio> [duracao]` gera `public/previews/<id>.mp4` (mudo, leve, em loop) e `<id>.jpg`. Depois preencha `previa` e `capa` no JSON.
-- **YouTube ao vivo:** `/api/youtube` (`api/youtube.js` na Vercel, `lib/youtube.js`) busca título, capa, data e números de todos os vídeos do canal pela YouTube Data API, com cache de 10 min (3 unidades de cota por atualização, de 10.000/dia grátis). Variáveis: `YOUTUBE_API_KEY` e `YOUTUBE_CHANNEL_HANDLE` (ex.: `@cauanmartins`) ou `YOUTUBE_CHANNEL_ID`. Sem elas, a home usa só o JSON.
-- Registro novo: além da página `registro-N.html`, adicione a ilha no JSON e a linha na lista "Todos os registros" da home.
+- `index.html` + `src/diorama.js` (Three.js): a mesa do Inteli, Cauan e Bruno como figurinhas de papel (`public/scene/*.png`), o diário que abre e vira página com o scroll e o afastamento até o mapa do Brasil. A altura de `#stage` (1000vh) é a duração da cena; os trechos estão em `FLIPS`, `COVER` e `shots()`.
+- Textos das páginas, fotos e vídeos de cada capítulo: `src/diorama-content.js` (sem mexer na cena).
+- Legendas, voto e newsletter são HTML por cima do canvas (`.cap` com `data-from`/`data-to` em fração do scroll).
+- Sem WebGL ou com "reduzir movimento", a página mostra só o conteúdo (`.no-3d`).
+- Fontes de mão (Caveat Brush, Caveat) vêm de `@fontsource`, servidas pelo próprio site.
+
+## Linha do tempo de conteúdos (`linha-do-tempo.html`)
+
+- Usa os tokens `--stage-*` de `public/theme.css` e os dados de `public/data/conteudos.json`, em ordem cronológica. Tipos de ilha: `conteudo`, `decisao`, `marco` e `registro`. Números desconhecidos ficam `null`.
+- Prévias dos vídeos: `scripts/make-previews.sh <video> <id> <inicio> [duracao]` gera `public/previews/<id>.mp4` e `<id>.jpg`.
+- **YouTube ao vivo:** `/api/youtube` (`api/youtube.js`, `lib/youtube.js`) com cache de 10 min. Variáveis: `YOUTUBE_API_KEY` e `YOUTUBE_CHANNEL_HANDLE` ou `YOUTUBE_CHANNEL_ID`.
+- Registro novo: página `registro-N.html`, item no JSON, linha na lista "Todos os registros" da home e um capítulo em `src/diorama-content.js`.
 
 ---
 
