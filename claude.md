@@ -91,6 +91,7 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 - A home (`index.html`) é **sempre escura**, de propósito: usa os tokens `--stage-*` de `public/theme.css` e esconde o botão de tema.
 - A linha do tempo vem de `public/data/conteudos.json`, em ordem cronológica (mais antigo primeiro). Tipos de ilha: `conteudo` (vídeo + números), `decisao` (frase grande), `marco` e `registro`. Números desconhecidos ficam `null` e aparecem como "—".
 - Prévias dos vídeos: `scripts/make-previews.sh <video> <id> <inicio> [duracao]` gera `public/previews/<id>.mp4` (mudo, leve, em loop) e `<id>.jpg`. Depois preencha `previa` e `capa` no JSON.
+- **YouTube ao vivo:** `/api/youtube` (`api/youtube.js` na Vercel, `lib/youtube.js`) busca título, capa, data e números de todos os vídeos do canal pela YouTube Data API, com cache de 10 min (3 unidades de cota por atualização, de 10.000/dia grátis). Variáveis: `YOUTUBE_API_KEY` e `YOUTUBE_CHANNEL_HANDLE` (ex.: `@cauanmartins`) ou `YOUTUBE_CHANNEL_ID`. Sem elas, a home usa só o JSON.
 - Registro novo: além da página `registro-N.html`, adicione a ilha no JSON e a linha na lista "Todos os registros" da home.
 
 ---

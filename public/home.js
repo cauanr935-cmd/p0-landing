@@ -88,7 +88,7 @@
   function renderContent(item) {
     var vertical = item.formato === 'vertical';
     var media = el('div', { class: 'media' }, [
-      el('span', { class: 'platform', text: PLATFORMS[item.plataforma] || item.plataforma }),
+      el('span', { class: 'platform', text: item.plataforma_rotulo || PLATFORMS[item.plataforma] || item.plataforma }),
     ]);
 
     if (item.previa) {
@@ -118,6 +118,10 @@
       ]));
     });
 
+    var metricsNote = item.ao_vivo
+      ? el('p', { class: 'metrics-live' }, [el('span', { class: 'live-dot', 'aria-hidden': 'true' }), ' números ao vivo do YouTube'])
+      : null;
+
     var lesson = el('p', {
       class: 'lesson' + (item.aprendizado ? '' : ' is-empty'),
       text: item.aprendizado || 'ainda escrevendo',
@@ -127,6 +131,7 @@
       verdictTag(item.veredito),
       el('h3', { text: item.titulo }),
       metrics,
+      metricsNote,
       lesson,
       el('div', { class: 'links' }, [linkChip(item.link, 'Assistir completo')]),
     ]);
@@ -165,6 +170,52 @@
     ]);
   }
 
+  // Data local (America/Sao_Paulo no navegador do visitante) em AAAA-MM-DD.
+  function localDay(iso) {
+    var d = new Date(iso);
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  // Junta os vídeos do canal (ao vivo) com o conteudos.json. O JSON guarda o
+  // que é nosso (veredito, aprendizado); o YouTube traz título, capa, data e
+  // números. Vídeo sem item no JSON vira uma ilha nova automaticamente.
+  function mergeYouTube(data, yt) {
+    var items = (data.itens || []).slice();
+    if (!yt || !yt.ok) return items;
+
+    var hidden = {};
+    (data.ocultar_youtube || []).forEach(function (id) { hidden[id] = true; });
+    var byId = {};
+    items.forEach(function (item) { if (item.youtube_id) byId[item.youtube_id] = item; });
+
+    yt.videos.forEach(function (v) {
+      if (hidden[v.id]) return;
+      var item = byId[v.id];
+      if (!item) {
+        item = { id: 'yt-' + v.id, tipo: 'conteudo', plataforma: 'youtube', youtube_id: v.id, veredito: null, aprendizado: null };
+        items.push(item);
+      }
+      item.titulo = item.titulo_fixo || v.title;
+      if (v.publishedAt) {
+        item.data = localDay(v.publishedAt);
+        item.data_confirmar = false;
+      }
+      if (!item.previa) item.capa = v.thumbnail || item.capa;
+      item.link = v.url;
+      item.formato = v.isShort ? 'vertical' : 'horizontal';
+      item.plataforma_rotulo = v.isShort ? 'YouTube Shorts' : 'YouTube';
+      item.metricas = { views: v.views, curtidas: v.likes, comentarios: v.comments };
+      item.ao_vivo = true;
+    });
+
+    // Ordem cronológica estável: mesmo dia mantém a ordem do JSON.
+    return items
+      .map(function (item, i) { return { item: item, i: i }; })
+      .sort(function (a, b) { return a.item.data < b.item.data ? -1 : a.item.data > b.item.data ? 1 : a.i - b.i; })
+      .map(function (x) { return x.item; });
+  }
+
   var RENDER = {
     conteudo: renderContent,
     decisao: renderDecision,
@@ -178,8 +229,8 @@
     });
   }
 
-  function render(data) {
-    var items = data.itens || [];
+  function render(data, yt) {
+    var items = mergeYouTube(data, yt);
     var running = 0;
     var anyViews = false;
 
@@ -210,6 +261,20 @@
     setStat('views', anyViews ? formatNumber(running) : '—');
     setStat('registros', registros);
     setStat('decisoes', items.filter(function (i) { return i.tipo === 'decisao'; }).length);
+
+    if (yt && yt.ok) {
+      if (typeof yt.channel.subscribers === 'number') {
+        setStat('inscritos', formatNumber(yt.channel.subscribers));
+        document.querySelectorAll('[data-live-only]').forEach(function (n) { n.hidden = false; });
+      }
+      var updated = document.getElementById('live-updated');
+      if (updated) {
+        var t = new Date(yt.updatedAt);
+        updated.textContent = 'Números do YouTube atualizados às ' +
+          String(t.getHours()).padStart(2, '0') + 'h' + String(t.getMinutes()).padStart(2, '0');
+        updated.hidden = false;
+      }
+    }
   }
 
   // ── Comportamento ao rolar ──
@@ -315,9 +380,16 @@
     setupFinale();
   }
 
-  fetch('/data/conteudos.json', { cache: 'no-cache' })
-    .then(function (res) { return res.json(); })
-    .then(function (data) { render(data); start(); })
+  var api = document.documentElement.dataset.api || '';
+  var youtube = fetch(api + '/api/youtube')
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .catch(function () { return null; });
+
+  Promise.all([
+    fetch('/data/conteudos.json', { cache: 'no-cache' }).then(function (res) { return res.json(); }),
+    youtube,
+  ])
+    .then(function (results) { render(results[0], results[1]); start(); })
     .catch(function () {
       stopsEl.appendChild(el('p', { class: 'hero-sub', text: 'Não foi possível carregar a linha do tempo agora. Os registros estão logo abaixo.' }));
       start();

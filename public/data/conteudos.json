@@ -1,6 +1,7 @@
 {
-  "_como_editar": "Ordem cronológica: do mais antigo para o mais recente. Tipos: conteudo (vídeo com números), decisao (texto grande), marco (momento em que algo começou) e registro (edição do diário). Números desconhecidos ficam null e aparecem como '—'. 'data_confirmar': true marca datas que ainda precisam ser conferidas. Prévias: rode scripts/make-previews.sh e preencha 'previa' e 'capa'.",
+  "_como_editar": "Ordem cronológica: do mais antigo para o mais recente. Tipos: conteudo (vídeo com números), decisao (texto grande), marco (momento em que algo começou) e registro (edição do diário). Números desconhecidos ficam null e aparecem como '—'. 'data_confirmar': true marca datas que ainda precisam ser conferidas. Prévias: rode scripts/make-previews.sh e preencha 'previa' e 'capa'. YouTube: com YOUTUBE_API_KEY configurada, título, capa, data, link e números de cada vídeo do canal vêm ao vivo da API (/api/youtube). Ligue um vídeo a um item pelo campo 'youtube_id' para somar o veredito e o aprendizado; vídeo do canal sem item vira ilha sozinho. Para esconder um vídeo, ponha o ID em 'ocultar_youtube'. 'titulo_fixo' e 'capa' com 'previa' têm prioridade sobre a API.",
   "inicio_publico": "2026-09-23",
+  "ocultar_youtube": [],
   "itens": [
     {
       "id": "registro-001",
@@ -40,8 +41,13 @@
       "previa": null,
       "link": "https://youtu.be/VY2pT_00GNI",
       "veredito": null,
-      "metricas": { "views": null, "curtidas": null, "comentarios": null },
-      "aprendizado": null
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null
+      },
+      "aprendizado": null,
+      "youtube_id": "VY2pT_00GNI"
     },
     {
       "id": "decisao-shorts-animados",
@@ -82,8 +88,13 @@
       "previa": null,
       "link": "https://youtu.be/FcmoHK_tdRg",
       "veredito": null,
-      "metricas": { "views": null, "curtidas": null, "comentarios": null },
-      "aprendizado": null
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null
+      },
+      "aprendizado": null,
+      "youtube_id": "FcmoHK_tdRg"
     },
     {
       "id": "decisao-musica",
@@ -106,7 +117,12 @@
       "previa": null,
       "link": null,
       "veredito": "teste",
-      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null,
+        "salvamentos": null
+      },
       "aprendizado": "Primeiro episódio animado da série: uma história de perrengue que todo aluno do Inteli já viveu."
     },
     {
@@ -129,7 +145,12 @@
       "previa": null,
       "link": null,
       "veredito": "teste",
-      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null,
+        "salvamentos": null
+      },
       "aprendizado": null
     },
     {
@@ -162,7 +183,12 @@
       "previa": null,
       "link": null,
       "veredito": null,
-      "metricas": { "views": null, "curtidas": null, "comentarios": null, "salvamentos": null },
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null,
+        "salvamentos": null
+      },
       "aprendizado": null
     },
     {
@@ -176,7 +202,11 @@
       "previa": null,
       "link": null,
       "veredito": null,
-      "metricas": { "views": null, "curtidas": null, "comentarios": null },
+      "metricas": {
+        "views": null,
+        "curtidas": null,
+        "comentarios": null
+      },
       "aprendizado": "Cinco versões do mesmo episódio em um dia."
     }
   ]

@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { subscribe, unsubscribe } from './lib/handlers.js';
+import { youtubeFeed } from './lib/youtube.js';
 
 dotenv.config();
 
@@ -18,6 +19,11 @@ app.post('/api/subscribe', async (req, res) => {
 app.get('/api/unsubscribe', async (req, res) => {
   const { status, html } = await unsubscribe(req.query);
   res.status(status).send(html);
+});
+
+app.get('/api/youtube', async (_req, res) => {
+  const { status, body } = await youtubeFeed();
+  res.status(status).json(body);
 });
 
 if (isProd) {

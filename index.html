@@ -181,7 +181,7 @@
   .hero-sub strong { color: var(--stage-text); font-weight: 600; }
   .stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1px;
     margin-top: 44px;
     max-width: 760px;
@@ -198,6 +198,10 @@
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
+  .stat[hidden] { display: none; }
+  .live-updated { margin-top: 12px; font-size: 12px; color: var(--stage-muted); }
+  .metrics-live { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--stage-muted); margin-top: -6px; }
+  .metrics-live .live-dot { width: 6px; height: 6px; }
   .stat-lbl { display: block; margin-top: 4px; font-size: 12px; color: var(--stage-muted); }
   .scroll-cue {
     margin-top: 48px;
@@ -658,9 +662,11 @@
       <div class="stats">
         <div class="stat"><span class="stat-num" data-stat="conteudos">—</span><span class="stat-lbl">conteúdos publicados</span></div>
         <div class="stat"><span class="stat-num" data-stat="views">—</span><span class="stat-lbl">views somadas</span></div>
+        <div class="stat" data-live-only hidden><span class="stat-num" data-stat="inscritos">—</span><span class="stat-lbl">inscritos no YouTube</span></div>
         <div class="stat"><span class="stat-num" data-stat="registros">—</span><span class="stat-lbl">registros no diário</span></div>
         <div class="stat"><span class="stat-num" data-stat="decisoes">—</span><span class="stat-lbl">erros e decisões abertas</span></div>
       </div>
+      <p class="live-updated" id="live-updated" hidden></p>
       <p class="scroll-cue"><span aria-hidden="true">↓</span> Role para ver como chegamos até aqui</p>
       </div>
       <figure class="hero-island reveal">
