@@ -90,6 +90,7 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 
 - `index.html` + `src/diorama.js` (Three.js): a mesa do Inteli, Cauan e Bruno como figurinhas de papel (`public/scene/*.png`), o diário que abre e vira página com o scroll e o afastamento até o mapa do Brasil. A altura de `#stage` (1000vh) é a duração da cena; os trechos estão em `FLIPS`, `COVER` e `shots()`.
 - Textos das páginas, fotos e vídeos de cada capítulo: `src/diorama-content.js` (sem mexer na cena).
+- A sala é a R06 do Inteli, modelada a partir das fotos da R07: `src/diorama-room.js` (medidas em `POD`, número da sala em `POD.roomNumber`). Casinha de pinus com frente de vidro e porta que abre quando a câmera chega, ripas diagonais por dentro, teto inclinado com LED, pendente sobre a mesa, TV com o relógio ao vivo (clique troca para o vídeo da visão), quadro branco na parede esquerda; por fora, tijolo, concreto, piso tátil, extintor e arandela. O telhado some no afastamento final para a câmera ver a mesa de cima.
 - Legendas, voto e newsletter são HTML por cima do canvas (`.cap` com `data-from`/`data-to` em fração do scroll).
 - Sem WebGL ou com "reduzir movimento", a página mostra só o conteúdo (`.no-3d`).
 - Fontes de mão (Caveat Brush, Caveat) vêm de `@fontsource`, servidas pelo próprio site.

@@ -496,6 +496,19 @@ export function drawWhiteboard(ctx, w, h) {
   ctx.fillText('☑ transcritor (WhisperX)', 90, 420);
   ctx.fillStyle = RED;
   ctx.fillText('abrir pra todo mundo? → ainda não', 90, 500);
+  // resto de aula de circuitos que ninguém apagou
+  ctx.strokeStyle = 'rgba(31,58,138,0.55)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  const zig = (x, y) => { ctx.lineTo(x, y); for (let i = 0; i < 6; i++) ctx.lineTo(x + 8 + i * 8, y + (i % 2 ? 10 : -10)); ctx.lineTo(x + 56, y); };
+  ctx.moveTo(1010, 640); zig(1040, 640); ctx.lineTo(1160, 640); ctx.lineTo(1160, 600); zig(1170, 600); ctx.lineTo(1290, 600);
+  ctx.moveTo(1160, 640); ctx.lineTo(1160, 690); zig(1170, 690); ctx.lineTo(1290, 690); ctx.lineTo(1290, 600);
+  ctx.stroke();
+  ctx.font = '600 38px "Caveat"';
+  ctx.fillStyle = 'rgba(31,58,138,0.6)';
+  ctx.fillText('12V', 960, 650);
+  ctx.fillText('2kΩ', 1050, 690);
+  ctx.fillText('C = 400 nF', 1180, 770);
   ctx.fillStyle = '#1f3a8a';
   ctx.font = '82px "Caveat Brush"';
   ctx.save();
@@ -508,17 +521,220 @@ export function drawWhiteboard(ctx, w, h) {
   ctx.restore();
 }
 
+// Painel acústico de ripas diagonais (feltro cinza-taupe da sala R0x do Inteli).
+// O ladrilho é contínuo: 20 ripas por largura, inclinação de ~32°.
 export function drawSlats(ctx, w, h, { bump = false } = {}) {
-  ctx.fillStyle = bump ? '#808080' : '#8a8d90';
+  ctx.fillStyle = bump ? '#a0a0a0' : '#8c857a';
   ctx.fillRect(0, 0, w, h);
-  const step = 48;
-  for (let x = -h; x < w + h; x += step) {
-    ctx.strokeStyle = bump ? '#202020' : '#6c6f72';
-    ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
-    ctx.strokeStyle = bump ? '#e0e0e0' : 'rgba(255,255,255,0.10)';
-    ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(x + 14, 0); ctx.lineTo(x + 14 + h, h); ctx.stroke();
+  if (!bump) {
+    const rand = seeded(21);
+    for (let i = 0; i < 2600; i++) {
+      ctx.fillStyle = `rgba(${rand() > 0.5 ? '255,255,255' : '40,30,20'},${rand() * 0.05})`;
+      ctx.fillRect(rand() * w, rand() * h, 2, 2);
+    }
+  }
+  const step = w / 20;
+  const dx = h * 1.6;
+  for (let x = -dx - step * 2; x < w + step * 2; x += step) {
+    for (let k = -1; k <= 1; k++) {
+      const ox = x + k * w;
+      ctx.strokeStyle = bump ? '#1a1a1a' : '#5f594f';
+      ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox + dx, h); ctx.stroke();
+      ctx.strokeStyle = bump ? '#dcdcdc' : 'rgba(255,255,255,0.09)';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(ox + 10, 0); ctx.lineTo(ox + 10 + dx, h); ctx.stroke();
+    }
+  }
+}
+
+export function drawPlywood(ctx, w, h, seed = 13) {
+  const rand = seeded(seed);
+  ctx.fillStyle = '#d9b27c';
+  ctx.fillRect(0, 0, w, h);
+  // manchas largas do pinus
+  for (let i = 0; i < 26; i++) {
+    const g = ctx.createRadialGradient(rand() * w, rand() * h, 0, rand() * w, rand() * h, 80 + rand() * 240);
+    g.addColorStop(0, `rgba(${rand() > 0.5 ? '190,130,70' : '240,210,160'},${0.15 + rand() * 0.2})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+  // veios
+  for (let i = 0; i < 70; i++) {
+    ctx.strokeStyle = `rgba(150,95,45,${0.06 + rand() * 0.12})`;
+    ctx.lineWidth = 1 + rand() * 3;
+    let x = rand() * w;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    for (let y = 0; y <= h; y += 24) {
+      x += Math.sin(y / (40 + rand() * 40) + i) * 3 + (rand() - 0.5) * 2;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+export function drawOak(ctx, w, h) {
+  const rand = seeded(17);
+  ctx.fillStyle = '#d8b88a';
+  ctx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 160; i++) {
+    ctx.strokeStyle = `rgba(${rand() > 0.6 ? '250,232,200' : '150,105,55'},${0.05 + rand() * 0.12})`;
+    ctx.lineWidth = 0.6 + rand() * 2.2;
+    const y = rand() * h;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= w; x += 30) ctx.lineTo(x, y + Math.sin(x / (90 + i) + i) * 4 + (rand() - 0.5) * 1.5);
+    ctx.stroke();
+  }
+}
+
+// Carpete berinjela com rabiscos claros, como o da sala.
+export function drawCarpet(ctx, w, h) {
+  drawNoise(ctx, w, h, '#4b3646', 22, 4);
+  const rand = seeded(8);
+  ctx.lineCap = 'round';
+  for (let i = 0; i < 120; i++) {
+    ctx.strokeStyle = `rgba(225,205,215,${0.12 + rand() * 0.18})`;
+    ctx.lineWidth = 1.5 + rand();
+    let x = rand() * w, y = rand() * h;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    for (let k = 0; k < 6; k++) {
+      x += 10 + rand() * 18;
+      y += (rand() - 0.5) * 16;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+export function drawConcrete(ctx, w, h) {
+  drawNoise(ctx, w, h, '#b7b2aa', 18, 6);
+  const rand = seeded(9);
+  for (let i = 0; i < 40; i++) {
+    const g = ctx.createRadialGradient(rand() * w, rand() * h, 0, rand() * w, rand() * h, 60 + rand() * 160);
+    g.addColorStop(0, `rgba(90,85,80,${rand() * 0.08})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+export function drawBrick(ctx, w, h) {
+  const rand = seeded(31);
+  ctx.fillStyle = '#e8e2d8';
+  ctx.fillRect(0, 0, w, h);
+  const bw = 64, bh = 24;
+  for (let row = 0; row * bh < h; row++) {
+    const off = row % 2 ? bw / 2 : 0;
+    for (let x = -bw; x < w + bw; x += bw) {
+      const r = 150 + rand() * 50, g = 95 + rand() * 35, b = 70 + rand() * 30;
+      ctx.fillStyle = `rgb(${r | 0},${g | 0},${b | 0})`;
+      ctx.fillRect(x + off + 2, row * bh + 2, bw - 4 - rand() * 3, bh - 4 - rand() * 2);
+      // cal velha por cima
+      if (rand() > 0.55) {
+        ctx.fillStyle = `rgba(240,235,225,${0.2 + rand() * 0.4})`;
+        ctx.fillRect(x + off + rand() * 40, row * bh + rand() * 14, 10 + rand() * 30, 4 + rand() * 8);
+      }
+    }
+  }
+}
+
+// Pontos de uma superfície perfurada (encosto das cadeiras).
+export function drawPerforated(ctx, w, h) {
+  ctx.fillStyle = '#e7e3da';
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(70,65,60,0.55)';
+  for (let y = 0.35 * h; y < 0.85 * h; y += 18) {
+    for (let x = 0.12 * w + ((y / 18) % 2) * 9; x < 0.88 * w; x += 18) {
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+
+// Letreiro de vinil na porta de vidro (o "0" leva um ponto no meio).
+export function drawDoorSign(ctx, w, h, text = 'R06') {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = `500 ${h * 0.78}px "Inter", sans-serif`;
+  ctx.textBaseline = 'middle';
+  let x = w * 0.06;
+  for (const ch of text) {
+    if (ch === '0') {
+      const r = h * 0.3;
+      ctx.lineWidth = h * 0.075;
+      ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath(); ctx.ellipse(x + r * 0.95, h / 2, r * 0.82, r * 1.12, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x + r * 0.95, h / 2, h * 0.07, 0, Math.PI * 2); ctx.fill();
+      x += r * 2.15;
+    } else {
+      ctx.fillText(ch, x, h / 2);
+      x += ctx.measureText(ch).width + h * 0.06;
+    }
+  }
+}
+
+export function drawRoomPlate(ctx, w, h, number = '6') {
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.roundRect(0, 0, w, h, 14); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.textAlign = 'center';
+  ctx.font = `600 ${h * 0.46}px "Inter", sans-serif`;
+  ctx.fillText(number, w / 2, h * 0.52);
+  ctx.font = `500 ${h * 0.1}px "Inter", sans-serif`;
+  ctx.fillText(`Sala de Reunião ${number}`, w / 2, h * 0.76);
+  ctx.fillStyle = '#666';
+  ctx.fillText(`Meeting Room ${number}`, w / 2, h * 0.9);
+}
+
+// Tela da TV: a tela de reserva da sala, com o relógio de quem está vendo.
+export function drawTvScreen(ctx, w, h, now = new Date(), room = 'REUNIAO06') {
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, '#05060a');
+  g.addColorStop(1, '#14121f');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  const pad = w * 0.045;
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `600 ${h * 0.085}px "Inter", sans-serif`;
+  ctx.fillText(`${hh}:${mm}`, pad, pad + h * 0.08);
+  ctx.font = `400 ${h * 0.038}px "Inter", sans-serif`;
+  ctx.fillText(`${String(now.getDate()).padStart(2, '0')} ${months[now.getMonth()]} ${now.getFullYear()}`, pad, pad + h * 0.14);
+  ctx.font = `700 ${h * 0.05}px "Inter", sans-serif`;
+  ctx.fillText(room, pad, pad + h * 0.215);
+  // reserva da sala: Be My Mentor
+  ctx.textAlign = 'center';
+  ctx.font = `300 ${h * 0.12}px "Inter", sans-serif`;
+  ctx.fillStyle = '#e9e6f5';
+  ctx.fillText('reservada', w / 2, h * 0.52);
+  ctx.font = `400 ${h * 0.05}px "Caveat Brush", cursive`;
+  ctx.fillStyle = '#a78bfa';
+  ctx.fillText('Be My Mentor · build in public', w / 2, h * 0.62);
+  ctx.textAlign = 'left';
+  const labels = ['Conferência sem fio', 'Espelhamento de tela', 'Windows com Miracast'];
+  const bw = (w - pad * 2 - 40) / 3;
+  labels.forEach((l, i) => {
+    const x = pad + i * (bw + 20);
+    ctx.fillStyle = 'rgba(150, 205, 245, 0.92)';
+    ctx.beginPath(); ctx.roundRect(x, h * 0.8, bw, h * 0.11, 8); ctx.fill();
+    ctx.fillStyle = '#0d2233';
+    ctx.font = `500 ${h * 0.03}px "Inter", sans-serif`;
+    ctx.fillText('▢ ' + l, x + 12, h * 0.8 + h * 0.06);
+  });
+}
+
+// Piso tátil (faixa de alerta em frente à porta).
+export function drawTactile(ctx, w, h) {
+  ctx.fillStyle = '#8f9196';
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#6c6e73';
+  for (let y = 10; y < h; y += 22) {
+    for (let x = 10; x < w; x += 22) { ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill(); }
   }
 }
 

@@ -10,6 +10,7 @@ import '@fontsource/caveat/latin-700.css';
 import { chapters, BRAZIL, CITIES } from './diorama-content.js';
 import * as paper from './diorama-paper.js';
 import * as sfx from './diorama-audio.js';
+import { buildRoom } from './diorama-room.js';
 
 const canvas = document.getElementById('scene');
 const stage = document.getElementById('stage');
@@ -82,7 +83,7 @@ function start() {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#07050d');
-  scene.fog = new THREE.Fog('#07050d', 8, 24);
+  scene.fog = new THREE.Fog('#07050d', 10, 26);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.28;
@@ -98,22 +99,11 @@ function start() {
   const std = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.85, ...extra });
   const shadowy = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
 
-  // Luz: spot quente sobre a mesa, preenchimento frio, LED no teto.
-  scene.add(new THREE.HemisphereLight('#cfd6ff', '#2a2233', 0.45));
-  const key = new THREE.SpotLight('#ffecd2', 24, 14, Math.PI / 5.2, 0.6, 1.4);
-  key.position.set(1.0, 4.2, 1.6);
-  key.target.position.set(0, 0.75, 0);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.bias = -0.0003;
-  key.shadow.normalBias = 0.02;
-  scene.add(key, key.target);
-  const fill = new THREE.DirectionalLight('#aeb9ff', 0.45);
-  fill.position.set(-3, 3, 2);
+  // Luz geral; as luzes da sala (pendente, LED, arandela) vêm com a sala.
+  scene.add(new THREE.HemisphereLight('#d7dcff', '#3a3030', 0.55));
+  const fill = new THREE.DirectionalLight('#dfe6ff', 0.55);
+  fill.position.set(-2, 6, 4);
   scene.add(fill);
-  const tvGlow = new THREE.PointLight('#8f7bff', 0.8, 3, 2);
-  tvGlow.position.set(3.0, 1.75, -0.6);
-  scene.add(tvGlow);
 
   const room = new THREE.Group();
   scene.add(room);
@@ -124,138 +114,9 @@ function start() {
     interactive.push(obj);
   }
 
-  // ── Sala ──
-  const [carpetC, carpetX] = paper.makeCanvas(512, 512);
-  paper.drawNoise(carpetX, 512, 512, '#3a3a42', 26, 4);
-  const carpet = canvasTex(carpetC);
-  carpet.wrapS = carpet.wrapT = THREE.RepeatWrapping;
-  carpet.repeat.set(6, 5);
-  // Sala como maquete: chão e paredes com espessura, cantos alinhados.
-  const RX0 = -3.2, RX1 = 3.35, RZ0 = -2.2, RZ1 = 2.2, WALL = 0.08, RH = 3;
-  const RW = RX1 - RX0, RD = RZ1 - RZ0, RCX = (RX0 + RX1) / 2;
-  const shell = std('#2a2a30', { roughness: 0.9 });
-  const floorTop = std('#ffffff', { map: carpet, roughness: 1 });
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(RW + WALL * 2, 0.08, RD + WALL), [shell, shell, floorTop, shell, shell, shell]);
-  floor.position.set(RCX, -0.04, -WALL / 2);
-  floor.receiveShadow = true;
-  room.add(floor);
-
-  const [slatsC, slatsX] = paper.makeCanvas(1024, 512);
-  paper.drawSlats(slatsX, 1024, 512);
-  const [slatsBC, slatsBX] = paper.makeCanvas(1024, 512);
-  paper.drawSlats(slatsBX, 1024, 512, { bump: true });
-  const slats = canvasTex(slatsC);
-  const slatsBump = canvasTex(slatsBC, { linear: true });
-  [slats, slatsBump].forEach((t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 1.3); });
-  const slatFace = std('#ffffff', { map: slats, bumpMap: slatsBump, bumpScale: 2.2 });
-  const backWall = new THREE.Mesh(new THREE.BoxGeometry(RW + WALL * 2, RH, WALL), [shell, shell, shell, shell, slatFace, shell]);
-  backWall.position.set(RCX, RH / 2, RZ0 - WALL / 2);
-  backWall.receiveShadow = true;
-  room.add(backWall);
-
-  const plaster = std('#cfccc6');
-  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(WALL, RH, RD), [shell, plaster, shell, shell, shell, shell]);
-  rightWall.position.set(RX1 + WALL / 2, RH / 2, 0);
-  rightWall.receiveShadow = true;
-  room.add(rightWall);
-
-  const [wbC, wbX] = paper.makeCanvas(1600, 900);
-  paper.drawWhiteboard(wbX, 1600, 900);
-  const boardFace = std('#ffffff', { map: canvasTex(wbC), roughness: 0.25, metalness: 0.05 });
-  const boardEdge = std('#d9dce0', { metalness: 0.4, roughness: 0.4 });
-  const whiteboard = new THREE.Mesh(new RoundedBoxGeometry(2.2, 1.24, 0.03, 4, 0.02), [boardEdge, boardEdge, boardEdge, boardEdge, boardFace, boardEdge]);
-  whiteboard.position.set(-0.4, 1.6, -2.17);
-  room.add(whiteboard);
-  const tray = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.025, 0.06), boardEdge);
-  tray.position.set(-0.4, 0.97, -2.13);
-  room.add(tray);
-  ['#1f3a8a', '#d2372b', '#111'].forEach((c, i) => {
-    const marker = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.13, 10), std(c, { roughness: 0.4 }));
-    marker.rotation.z = Math.PI / 2;
-    marker.position.set(-0.75 + i * 0.16, 0.995, -2.12);
-    room.add(marker);
-  });
-  clickable(whiteboard, 'o quadro da sprint', () => bubbleAt(whiteboard, 'Tudo que tá no quadro saiu de um registro.'));
-
-  // Divisória de vidro escuro com perfil preto, alinhada ao chão e à parede do fundo
-  const glass = new THREE.Mesh(
-    new THREE.BoxGeometry(0.03, RH, RD),
-    new THREE.MeshStandardMaterial({ color: '#15171c', roughness: 0.05, metalness: 0.7, transparent: true, opacity: 0.88 }),
-  );
-  glass.position.set(RX0 - 0.015, RH / 2, 0);
-  room.add(glass);
-  const profile = std('#0b0b0d', { roughness: 0.5 });
-  for (let z = RZ0; z <= RZ1 + 0.01; z += RD / 4) {
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, RH, 0.05), profile);
-    frame.position.set(RX0 - 0.015, RH / 2, Math.min(Math.max(z, RZ0 + 0.025), RZ1 - 0.025));
-    room.add(frame);
-  }
-  [0.025, 1.0, RH - 0.025].forEach((y) => {
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, RD), profile);
-    rail.position.set(RX0 - 0.015, y, 0);
-    room.add(rail);
-  });
-
-  // LED linear no teto
-  const led = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 3), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
-  led.position.set(0.9, 2.95, -0.2);
-  room.add(led);
-
-  // TV na parede direita, tocando a visão da rede
-  const tvVideo = makeVideo('/previews/visao-rede.mp4');
-  const tvTex = new THREE.VideoTexture(tvVideo);
-  tvTex.colorSpace = THREE.SRGBColorSpace;
-  const tv = new THREE.Group();
-  tv.add(new THREE.Mesh(new RoundedBoxGeometry(1.3, 0.76, 0.05, 3, 0.01), std('#0a0a0a', { roughness: 0.25, metalness: 0.3 })));
-  const tvScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.24, 0.7), new THREE.MeshBasicMaterial({ map: tvTex, toneMapped: false }));
-  tvScreen.position.z = 0.027;
-  tv.add(tvScreen);
-  tv.rotation.y = -Math.PI / 2;
-  tv.position.set(3.3, 1.75, -0.6);
-  room.add(tv);
-  clickable(tv, 'a visão', () => bubbleAt(tv, 'Uma mentoria vira hora complementar. Depois, mil mentorias.'));
-
-  // Mesa
-  const [woodC, woodX] = paper.makeCanvas(1024, 512);
-  paper.drawWood(woodX, 1024, 512);
-  const top = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.8, 0.04, 1.0, 3, 0.012), std('#ffffff', { map: canvasTex(woodC), roughness: 0.55 })));
-  top.position.y = 0.75;
-  room.add(top);
-  [[-0.85, -0.45], [0.85, -0.45], [-0.85, 0.45], [0.85, 0.45]].forEach(([x, z]) => {
-    const leg = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.73, 0.035), std('#111', { roughness: 0.4, metalness: 0.5 })));
-    leg.position.set(x, 0.365, z);
-    room.add(leg);
-  });
-
-  // Cadeiras de tecido cinza-esverdeado
-  const [fabC, fabX] = paper.makeCanvas(256, 256);
-  paper.drawNoise(fabX, 256, 256, '#7f8c84', 34, 9);
-  const fabTex = canvasTex(fabC);
-  fabTex.wrapS = fabTex.wrapT = THREE.RepeatWrapping;
-  fabTex.repeat.set(3, 3);
-  const fabric = std('#ffffff', { map: fabTex, roughness: 1 });
-  function chair(x, z, ry) {
-    const g = new THREE.Group();
-    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.47, 0.08, 0.45, 3, 0.03), fabric));
-    seat.position.y = 0.46;
-    const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.47, 0.44, 0.06, 3, 0.025), fabric));
-    back.position.set(0, 0.71, -0.21);
-    back.rotation.x = -0.08;
-    g.add(seat, back);
-    [[-0.21, -0.2], [0.21, -0.2], [-0.21, 0.2], [0.21, 0.2]].forEach(([lx, lz]) => {
-      const l = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.44, 8), std('#0d0d0d', { roughness: 0.4, metalness: 0.6 }));
-      l.position.set(lx, 0.22, lz);
-      g.add(l);
-    });
-    g.position.set(x, 0, z);
-    g.rotation.y = ry;
-    room.add(g);
-  }
-  chair(-0.45, 0.8, Math.PI);
-  chair(0.47, 0.86, Math.PI + 0.14);
-  chair(0.1, -0.82, 0.05);
-
-  const onTable = 0.77;
+  // ── A sala R06 do Inteli ──
+  const R = buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, makeVideo, renderer });
+  const { key, onTable } = R;
 
   // Notebook com o terminal do EP 01 (a tela digita sozinha)
   const [lsC, lsX] = paper.makeCanvas(1024, 640);
@@ -366,17 +227,16 @@ function start() {
     side: THREE.DoubleSide,
     uniforms: { uOpacity: { value: 1 } },
     vertexShader: 'varying float vY; void main(){ vY = uv.y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'varying float vY; uniform float uOpacity; void main(){ gl_FragColor = vec4(1.0,0.92,0.8, 0.06 * pow(vY, 1.6) * uOpacity); }',
+    fragmentShader: 'varying float vY; uniform float uOpacity; void main(){ gl_FragColor = vec4(1.0,0.92,0.8, 0.07 * pow(vY, 1.3) * uOpacity); }',
   });
-  const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 1.1, 3.3, 32, 1, true), coneMat);
-  cone.position.set(0.55, 2.55, 0.85);
-  cone.lookAt(new THREE.Vector3(0, 0.75, 0));
-  cone.rotateX(-Math.PI / 2);
+  const beamH = R.beam.top - onTable;
+  const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.78, beamH, 40, 1, true), coneMat);
+  cone.position.set(R.beam.x, onTable + beamH / 2, R.beam.z);
   room.add(cone);
   const dustN = quality === 'high' ? 380 : 160;
   const dustPos = new Float32Array(dustN * 3);
   for (let i = 0; i < dustN; i++) {
-    dustPos.set([(Math.random() - 0.5) * 1.4, 0.8 + Math.random() * 1.9, (Math.random() - 0.5) * 1.2], i * 3);
+    dustPos.set([(Math.random() - 0.5) * 1.2, 0.8 + Math.random() * 1.2, -0.05 + (Math.random() - 0.5) * 1.1], i * 3);
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
@@ -722,9 +582,9 @@ function start() {
     const far = (shot, k) => (narrow ? { pos: shot.look.clone().add(shot.pos.clone().sub(shot.look).multiplyScalar(k)), look: shot.look } : shot);
     const L = bookShot(-1), R = bookShot(1), C = bookShot(0);
     const list = [
-      [0, far({ pos: V(2.6, 1.85, 3.2), look: V(-0.2, 1.05, -0.8) }, 1.35)],
-      [TL.intro.wide[1], far({ pos: V(2.2, 1.6, 2.6), look: V(-0.2, 1.0, -0.6) }, 1.35)],
-      [TL.intro.table[1], far({ pos: V(0.55, 1.18, 0.95), look: V(0, onTable + 0.08, -0.1) }, 1.7)],
+      [0, far({ pos: V(2.7, 1.65, 6.0), look: V(0.15, 1.3, 0.6) }, 1.3)],
+      [TL.intro.wide[1], far({ pos: V(0.78, 1.5, 2.75), look: V(0.3, 1.1, 0) }, 1.3)],
+      [TL.intro.table[1], far({ pos: V(0.55, 1.18, 0.95), look: V(0, onTable + 0.08, -0.1) }, 1.45)],
       [TL.cover[1], C],
     ];
     TL.holds.forEach(([s, e], i) => {
@@ -983,12 +843,11 @@ function start() {
     v.crossOrigin = 'anonymous';
     return v;
   }
-  tvVideo.play().catch(() => {});
 
   // ── Loop ──
   const timer = new THREE.Timer();
   let frames = 0, slowFrames = 0, checked = false;
-  let laptopFrame = 0, lastLaptop = 0;
+  let laptopFrame = 0, lastLaptop = 0, lastClock = 0;
   let nextBuzz = 6;
 
   function frame(now) {
@@ -1041,6 +900,9 @@ function start() {
     phone.position.x = phone.userData.base.x + Math.sin(time * 90) * 0.0015 * phoneShake;
     phone.rotation.y = 0.35 + Math.sin(time * 70) * 0.03 * phoneShake;
 
+    // relógio da TV
+    if (time - lastClock > 15) { lastClock = time; R.drawClock(); }
+
     // notebook digitando
     if (time - lastLaptop > 0.45) {
       lastLaptop = time;
@@ -1064,7 +926,7 @@ function start() {
       for (let i = 0; i < arr.length; i += 3) {
         arr[i + 1] += dt * 0.012;
         arr[i] += Math.sin(time * 0.3 + i) * dt * 0.004;
-        if (arr[i + 1] > 2.7) arr[i + 1] = 0.8;
+        if (arr[i + 1] > 2.0) arr[i + 1] = 0.8;
       }
       dustGeo.attributes.position.needsUpdate = true;
     }
@@ -1073,7 +935,9 @@ function start() {
     const pull = seg(t, TL.pull);
     const s = 1 - ease(Math.min(1, pull * 1.7)) * 0.985;
     room.scale.setScalar(s);
-    key.intensity = 24 * s * s + 1;
+    key.intensity = 7 * s * s + 0.3;
+    R.roof.visible = t < TL.pull[0] + 0.004;
+    R.door.rotation.y = -1.35 * ease(seg(t, [0.045, 0.1]));
     coneMat.uniforms.uOpacity.value = s;
     mapMat.opacity = ease(seg(t, [0.885, 0.95]));
     const lightUp = ease(seg(t, [0.935, 1.0]));
@@ -1083,8 +947,8 @@ function start() {
       const k = clamp01((lightUp - line.userData.delay * 0.6) / 0.35);
       line.geometry.setDrawRange(0, Math.floor(k * 49));
     });
-    scene.fog.near = 8 + pull * 120;
-    scene.fog.far = 24 + pull * 200;
+    scene.fog.near = 10 + pull * 120;
+    scene.fog.far = 26 + pull * 200;
 
     placeBubble();
     renderer.render(scene, camera);
