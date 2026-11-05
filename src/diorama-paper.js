@@ -506,9 +506,6 @@ export function drawWhiteboard(ctx, w, h) {
   ctx.fillText('querem falar', 0, 50);
   ctx.fillText('e não conseguem', 0, 96);
   ctx.restore();
-  ctx.font = '600 58px "Caveat"';
-  ctx.fillStyle = '#222';
-  ctx.fillText('#ApoioBruno', w - 400, h - 70);
 }
 
 export function drawSlats(ctx, w, h, { bump = false } = {}) {

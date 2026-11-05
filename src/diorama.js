@@ -130,8 +130,13 @@ function start() {
   const carpet = canvasTex(carpetC);
   carpet.wrapS = carpet.wrapT = THREE.RepeatWrapping;
   carpet.repeat.set(6, 5);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(7, 6), std('#ffffff', { map: carpet, roughness: 1 }));
-  floor.rotation.x = -Math.PI / 2;
+  // Sala como maquete: chão e paredes com espessura, cantos alinhados.
+  const RX0 = -3.2, RX1 = 3.35, RZ0 = -2.2, RZ1 = 2.2, WALL = 0.08, RH = 3;
+  const RW = RX1 - RX0, RD = RZ1 - RZ0, RCX = (RX0 + RX1) / 2;
+  const shell = std('#2a2a30', { roughness: 0.9 });
+  const floorTop = std('#ffffff', { map: carpet, roughness: 1 });
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(RW + WALL * 2, 0.08, RD + WALL), [shell, shell, floorTop, shell, shell, shell]);
+  floor.position.set(RCX, -0.04, -WALL / 2);
   floor.receiveShadow = true;
   room.add(floor);
 
@@ -142,14 +147,16 @@ function start() {
   const slats = canvasTex(slatsC);
   const slatsBump = canvasTex(slatsBC, { linear: true });
   [slats, slatsBump].forEach((t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 1.3); });
-  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(7, 3), std('#ffffff', { map: slats, bumpMap: slatsBump, bumpScale: 2.2 }));
-  backWall.position.set(0, 1.5, -2.2);
+  const slatFace = std('#ffffff', { map: slats, bumpMap: slatsBump, bumpScale: 2.2 });
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(RW + WALL * 2, RH, WALL), [shell, shell, shell, shell, slatFace, shell]);
+  backWall.position.set(RCX, RH / 2, RZ0 - WALL / 2);
   backWall.receiveShadow = true;
   room.add(backWall);
 
-  const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 3), std('#cfccc6'));
-  rightWall.rotation.y = -Math.PI / 2;
-  rightWall.position.set(3.35, 1.5, 0);
+  const plaster = std('#cfccc6');
+  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(WALL, RH, RD), [shell, plaster, shell, shell, shell, shell]);
+  rightWall.position.set(RX1 + WALL / 2, RH / 2, 0);
+  rightWall.receiveShadow = true;
   room.add(rightWall);
 
   const [wbC, wbX] = paper.makeCanvas(1600, 900);
@@ -168,24 +175,26 @@ function start() {
     marker.position.set(-0.75 + i * 0.16, 0.995, -2.12);
     room.add(marker);
   });
-  clickable(whiteboard, 'o quadro da sprint', () => bubbleAt(whiteboard, 'Tudo que tá no quadro saiu de um registro. #ApoioBruno'));
+  clickable(whiteboard, 'o quadro da sprint', () => bubbleAt(whiteboard, 'Tudo que tá no quadro saiu de um registro.'));
 
-  // Divisória de vidro escuro com perfil preto
+  // Divisória de vidro escuro com perfil preto, alinhada ao chão e à parede do fundo
   const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.4, 3),
+    new THREE.BoxGeometry(0.03, RH, RD),
     new THREE.MeshStandardMaterial({ color: '#15171c', roughness: 0.05, metalness: 0.7, transparent: true, opacity: 0.88 }),
   );
-  glass.rotation.y = Math.PI / 2;
-  glass.position.set(-3.2, 1.5, 0);
+  glass.position.set(RX0 - 0.015, RH / 2, 0);
   room.add(glass);
-  for (let z = -2.2; z <= 2.21; z += 1.1) {
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.04, 3, 0.04), std('#0b0b0d', { roughness: 0.5 }));
-    frame.position.set(-3.18, 1.5, z);
+  const profile = std('#0b0b0d', { roughness: 0.5 });
+  for (let z = RZ0; z <= RZ1 + 0.01; z += RD / 4) {
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, RH, 0.05), profile);
+    frame.position.set(RX0 - 0.015, RH / 2, Math.min(Math.max(z, RZ0 + 0.025), RZ1 - 0.025));
     room.add(frame);
   }
-  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 4.4), std('#0b0b0d'));
-  rail.position.set(-3.18, 1.0, 0);
-  room.add(rail);
+  [0.025, 1.0, RH - 0.025].forEach((y) => {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, RD), profile);
+    rail.position.set(RX0 - 0.015, y, 0);
+    room.add(rail);
+  });
 
   // LED linear no teto
   const led = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 3), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
@@ -484,17 +493,21 @@ function start() {
   rightPage.rotation.x = -Math.PI / 2;
   rightPage.position.set(PW / 2 + 0.004, 0.013, 0);
   leftPage.receiveShadow = rightPage.receiveShadow = true;
-  book.add(leftPage, rightPage);
+  book.add(rightPage);
   // miolo (folhas empilhadas) e contracapa
   const edgePaper = std('#ece5d3', { roughness: 1 });
+  // Fechado, o caderno tem só a metade da direita; a esquerda aparece quando a capa deita na mesa.
+  const leftHalf = new THREE.Group();
   [-1, 1].forEach((s) => {
     const block = shadowy(new THREE.Mesh(new RoundedBoxGeometry(PW + 0.002, 0.01, PH + 0.002, 2, 0.002), edgePaper));
     block.position.set(s * (PW / 2 + 0.004), 0.007, 0);
-    book.add(block);
+    const board = shadowy(new THREE.Mesh(new RoundedBoxGeometry(PW + 0.014, 0.004, PH + 0.014, 2, 0.0015), std('#1b1b22', { roughness: 0.8 })));
+    board.position.set(s * ((PW + 0.014) / 2 + 0.002), 0.001, 0);
+    if (s < 0) leftHalf.add(block, board, leftPage);
+    else book.add(block, board);
   });
-  const backCover = shadowy(new THREE.Mesh(new RoundedBoxGeometry(PW * 2 + 0.03, 0.004, PH + 0.014, 2, 0.002), std('#1b1b22', { roughness: 0.8 })));
-  backCover.position.y = 0.001;
-  book.add(backCover);
+  book.add(leftHalf);
+  leftHalf.visible = false;
   for (let i = 0; i < 16; i++) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.008, 0.0015, 6, 16), std('#c3c7cf', { metalness: 0.9, roughness: 0.25 }));
     ring.position.set(0, 0.014, -PH / 2 + 0.012 + i * ((PH - 0.024) / 15));
@@ -543,13 +556,22 @@ function start() {
   // Capa dura que abre
   const [cvC, cvX] = paper.makeCanvas(PX, PY);
   paper.drawCover(cvX, PX, PY);
-  const coverMats = [std('#1b1b22'), std('#1b1b22'), std('#ffffff', { map: canvasTex(cvC), roughness: 0.75 }), std('#26262e'), std('#1b1b22'), std('#1b1b22')];
+  const coverInside = new THREE.MeshStandardMaterial({ color: PAGE_TINT, roughness: 0.95 });
+  const coverMats = [std('#1b1b22'), std('#1b1b22'), std('#ffffff', { map: canvasTex(cvC), roughness: 0.75 }), coverInside, std('#1b1b22'), std('#1b1b22')];
   const coverBoard = shadowy(new THREE.Mesh(new RoundedBoxGeometry(PW + 0.014, 0.004, PH + 0.014, 2, 0.0015), coverMats));
   coverBoard.position.x = (PW + 0.014) / 2;
   const cover = new THREE.Group();
   cover.add(coverBoard);
   cover.position.set(0.002, 0.018, 0);
   book.add(cover);
+
+  // por dentro, a capa já traz a primeira página da esquerda: ela aparece enquanto a capa deita
+  const insideTex = spreads[0].left.clone();
+  insideTex.wrapS = insideTex.wrapT = THREE.RepeatWrapping;
+  insideTex.repeat.set(-1, -1);
+  insideTex.needsUpdate = true;
+  coverInside.map = insideTex;
+  coverInside.needsUpdate = true;
 
   // Polaroids (foto ou vídeo) e áreas clicáveis de cada página dupla
   const extras = chapters.map((ch, i) => {
@@ -599,7 +621,7 @@ function start() {
   const [spX, spZ] = toMap(-46.72, -23.57);
   const map = new THREE.Mesh(new THREE.PlaneGeometry(MAP_W, MAP_H), mapMat);
   map.rotation.x = -Math.PI / 2;
-  map.position.set(-spX, -0.03, -spZ);
+  map.position.set(-spX, -0.09, -spZ);
   scene.add(map);
 
   const pts = CITIES.map(([lon, lat]) => [lon, lat]);
@@ -616,8 +638,13 @@ function start() {
     const p = [lonMin + rand() * (lonMax - lonMin), latMin + rand() * (latMax - latMin)];
     if (inside(p, BRAZIL)) pts.push(p);
   }
+  // nada acende embaixo da sala: tira os pontos colados no Inteli
+  for (let i = pts.length - 1; i >= 0; i--) {
+    const [mx, mz] = toMap(pts[i][0], pts[i][1]);
+    if (Math.hypot(mx - spX, mz - spZ) < 1.2) pts.splice(i, 1);
+  }
   const spDist = pts.map(([lon, lat]) => Math.hypot(lon + 46.72, lat + 23.57));
-  const order = pts.map((_, i) => i).sort((a, b) => (a < CITIES.length ? -1 : 0) - (b < CITIES.length ? -1 : 0) || spDist[a] - spDist[b]);
+  const order = pts.map((_, i) => i).sort((a, b) => (a < CITIES.length - 1 ? -1 : 0) - (b < CITIES.length - 1 ? -1 : 0) || spDist[a] - spDist[b]);
   const dotPos = new Float32Array(pts.length * 3);
   const reveal = new Float32Array(pts.length);
   const local = (lon, lat) => { const [mx, mz] = toMap(lon, lat); return [mx - spX, mz - spZ]; };
@@ -670,14 +697,6 @@ function start() {
     scene.add(line);
     arcs.push(line);
   });
-
-  // Pino do Inteli com pulso
-  const pin = new THREE.Group();
-  const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.65, 40), new THREE.MeshBasicMaterial({ color: '#ff7a8a', transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false }));
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0.06;
-  pin.add(ring);
-  scene.add(pin);
 
   // ── Roteiro de câmera ──
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -752,6 +771,7 @@ function start() {
     cover.rotation.z = Math.PI * c;
     cover.position.y = 0.018 + Math.sin(Math.PI * c) * 0.004;
     cover.visible = c < 0.999;
+    leftHalf.visible = c >= 0.999;
 
     let base = 0, flipping = -1, p = 0;
     TL.flips.forEach((f, i) => {
@@ -1051,21 +1071,18 @@ function start() {
 
     // afastamento: a sala encolhe até virar um ponto em São Paulo
     const pull = seg(t, TL.pull);
-    const s = 1 - ease(Math.min(1, pull * 1.25)) * 0.985;
+    const s = 1 - ease(Math.min(1, pull * 1.7)) * 0.985;
     room.scale.setScalar(s);
     key.intensity = 24 * s * s + 1;
     coneMat.uniforms.uOpacity.value = s;
     mapMat.opacity = ease(seg(t, [0.885, 0.95]));
-    const lightUp = ease(seg(t, [0.9, 1.0]));
+    const lightUp = ease(seg(t, [0.935, 1.0]));
     dotMat.uniforms.uProgress.value = lightUp * 1.04;
     dotMat.uniforms.uTime.value = time;
     arcs.forEach((line) => {
       const k = clamp01((lightUp - line.userData.delay * 0.6) / 0.35);
       line.geometry.setDrawRange(0, Math.floor(k * 49));
     });
-    const pulse = (time * 0.8) % 1;
-    ring.scale.setScalar(1 + pulse * 2.5);
-    ring.material.opacity = ease(seg(t, [0.95, 1])) * (1 - pulse) * 0.9;
     scene.fog.near = 8 + pull * 120;
     scene.fog.far = 24 + pull * 200;
 
