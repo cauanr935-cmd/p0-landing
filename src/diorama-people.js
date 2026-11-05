@@ -9,15 +9,16 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 // estampa branca no peito, cabelo curto escuro e calça escura.
 export const LOOKS = {
   // rostos e cabelos a partir da foto da escada: Cauan de pele morena escura,
-  // cachos volumosos, cavanhaque e bigode, óculos de armação escura; Bruno de
-  // pele morena clara, rosto fino, cabelo liso curto penteado para frente.
+  // cavanhaque e bigode, óculos de armação escura; Bruno de
+  // pele morena clara, rosto fino. Os dois de cabelo liso: Cauan médio, repartido
+  // de lado; Bruno curto, penteado para frente.
   cauan: {
     height: 1.78, hoodie: '#27324f', hoodieDark: '#1b2338', pants: '#c3ad86', skin: '#94603f',
-    hair: '#120d0a', hairStyle: 'curly', beard: true, glasses: true, freeArm: 'hip', faceW: 0.9,
+    hair: '#120d0a', hairStyle: 'straight-medium', beard: true, glasses: true, freeArm: 'hip', faceW: 0.9,
   },
   bruno: {
     height: 1.74, hoodie: '#1d1d21', hoodieDark: '#121215', pants: '#25272c', skin: '#d29c78',
-    hair: '#18120e', hairStyle: 'short', beard: false, glasses: false, freeArm: 'hang', print: true, faceW: 0.86,
+    hair: '#18120e', hairStyle: 'straight-short', beard: false, glasses: false, freeArm: 'hang', print: true, faceW: 0.86,
   },
 };
 
@@ -251,86 +252,114 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
     head.add(bridgeG);
   }
 
-  // ── cabelo esculpido (mechas grandes e lisas, como em animação) ──
+  // ── cabelo liso esculpido: uma base lisa + mechas largas e achatadas que
+  // deitam na cabeça seguindo o penteado (como em filme de animação) ──
   let seed = who === 'cauan' ? 11 : 23;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const hairM = new THREE.MeshPhysicalMaterial({ color: L.hair, roughness: 0.42, clearcoat: 0.3, clearcoatRoughness: 0.5 });
-  // mecha: um "dente" curvo e afilado, apontando para `dir`
-  const lockGeo = (() => {
+  const hairM = new THREE.MeshPhysicalMaterial({ color: L.hair, roughness: 0.38, clearcoat: 0.35, clearcoatRoughness: 0.45 });
+  // forma aproximada do crânio, para assentar as mechas
+  const SK = { c: new THREE.Vector3(0, 0.012, -0.006), r: new THREE.Vector3(0.1 * fw * 0.98, 0.106, 0.1) };
+  const DOWN = new THREE.Vector3(0, -1, 0);
+  const pos = [], idx = [];
+  // Uma mecha é uma fita que "anda" pela superfície da cabeça seguindo o
+  // penteado; abaixo da linha da orelha ela cai com a gravidade.
+  const strand = (d, flow, len, wid, lift, gravity = 0.6) => {
+    const R = SK.r.clone().addScalar(lift);
+    const onShell = (p) => {
+      const q = p.clone().sub(SK.c);
+      const e = Math.hypot(q.x / R.x, q.y / R.y, q.z / R.z);
+      return { e, snapped: SK.c.clone().add(q.divideScalar(e)) };
+    };
+    const normalAt = (p) => {
+      const q = p.clone().sub(SK.c);
+      return new THREE.Vector3(q.x / (R.x * R.x), q.y / (R.y * R.y), q.z / (R.z * R.z)).normalize();
+    };
+    const steps = 9;
+    const step = len / steps;
+    let p = SK.c.clone().add(d.clone().normalize().multiply(R));
     const pts = [];
-    for (let i = 0; i <= 10; i++) {
-      const t = i / 10;
-      pts.push(new THREE.Vector2(0.032 * Math.pow(1 - t, 0.55) * (0.75 + 0.25 * Math.sin(Math.PI * Math.min(1, t * 2.2))) + 0.002, t * 0.07));
+    for (let i = 0; i <= steps; i++) {
+      const n = normalAt(p);
+      pts.push({ p: p.clone(), n });
+      const f = flow.clone().lerp(DOWN, Math.min(1, (i / steps) * gravity)).normalize();
+      const tdir = f.sub(n.clone().multiplyScalar(f.dot(n))).normalize();
+      p = p.add(tdir.multiplyScalar(step));
+      const sh = onShell(p);
+      // em cima da cabeça a mecha fica deitada; embaixo só não pode entrar na cabeça
+      if (sh.e < 1 || p.y > SK.c.y - 0.03) p = sh.snapped;
     }
-    const g = new THREE.LatheGeometry(pts, 14);
-    g.scale(1, 1, 0.65);
-    // curva a mecha para trás, como cabelo penteado
-    const pa = g.attributes.position;
-    for (let i = 0; i < pa.count; i++) {
-      const y = pa.getY(i) / 0.07;
-      pa.setZ(i, pa.getZ(i) - y * y * 0.035);
-    }
-    g.computeVertexNormals();
-    return g;
-  })();
-  const addLock = (pos, dir, size, bend = 0.4) => {
-    const m = shadowy(new THREE.Mesh(lockGeo, hairM));
-    m.position.copy(pos);
-    m.quaternion.setFromUnitVectors(UP, dir.clone().normalize());
-    m.rotateX(bend * 0.3);
-    m.scale.setScalar(size);
-    head.add(m);
-  };
-  if (L.hairStyle === 'short') {
-    // base lisa por cima e atrás, rente nas laterais
-    const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.106, 36, 22, 0, Math.PI * 2, 0, 1.72), hairM));
-    cap.scale.set(fw * 1.04, 1.08, 1.06);
-    cap.rotation.x = -0.62;
-    cap.position.set(0, 0.018, -0.012);
-    head.add(cap);
-    // topete varrido para cima e para frente
-    // topete: mechas grossas saindo da linha do cabelo e varridas para cima e para trás
-    const rows = [
-      { z: 0.075, y: 0.078, dir: [1, 0.35], size: 1.25 },
-      { z: 0.04, y: 0.1, dir: [0.8, -0.45], size: 1.1 },
-      { z: 0.0, y: 0.11, dir: [0.55, -0.85], size: 1.0 },
-      { z: -0.045, y: 0.098, dir: [0.35, -1], size: 0.9 },
-    ];
-    rows.forEach((r, ri) => {
-      const n = ri === 0 ? 5 : 6;
-      for (let i = 0; i < n; i++) {
-        const x = (i / (n - 1) - 0.5) * 0.12 * fw + (rand() - 0.5) * 0.01;
-        const y = r.y - x * x * 3;
-        const dir = new THREE.Vector3(x * 1.2, r.dir[0], r.dir[1]);
-        addLock(new THREE.Vector3(x, y, r.z), dir, r.size * (0.85 + rand() * 0.3));
+    const base = pos.length / 3;
+    pts.forEach((pt, i) => {
+      const t = i / steps;
+      const next = pts[Math.min(steps, i + 1)].p, prev = pts[Math.max(0, i - 1)].p;
+      const along = next.clone().sub(prev).normalize();
+      const side = new THREE.Vector3().crossVectors(along, pt.n).normalize();
+      const w = wid * (1 - Math.pow(t, 2.2)) * 0.5 + 0.0008;
+      const ridge = pt.n.clone().multiplyScalar(0.0045 * (1 - t * 0.6));
+      [side.clone().multiplyScalar(-w), ridge, side.clone().multiplyScalar(w)].forEach((o) => {
+        const v = pt.p.clone().add(o);
+        pos.push(v.x, v.y, v.z);
+      });
+      if (i < steps) {
+        const a = base + i * 3, b = a + 3;
+        idx.push(a, b, a + 1, a + 1, b, b + 1, a + 1, b + 1, a + 2, a + 2, b + 1, b + 2);
       }
     });
+  };
+  const addLock = (d, flow, len, wid, lift = 0.006, gravity) => strand(d, flow, len, wid, lift, gravity);
+  // base lisa por cima e atrás; rotação define a linha do cabelo na testa
+  const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.106, 40, 26, 0, Math.PI * 2, 0, 1.85), hairM));
+  cap.scale.set(fw * 1.04, 1.07, 1.05);
+  cap.rotation.x = -0.58;
+  cap.position.set(0, 0.016, -0.01);
+  head.add(cap);
 
-  } else {
-    // black power arredondado: "nuvem" de cachos grandes e lisos
-    const curlGeo = new THREE.SphereGeometry(1, 16, 12);
-    const N = 150;
-    const curls = new THREE.InstancedMesh(curlGeo, hairM, N);
-    curls.castShadow = curls.receiveShadow = true;
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
-    let n = 0;
-    while (n < N) {
-      const dir = new THREE.Vector3(rand() * 2 - 1, rand() * 2 - 1, rand() * 2 - 1).normalize();
-      if (dir.z > 0.1 && dir.y < 0.55) continue; // rosto e testa livres
-      if (dir.y < -0.35) continue;
-      if (dir.y < 0.05 && dir.z > -0.1 && Math.abs(dir.x) > 0.55) continue; // orelhas aparecendo
-      const R = 0.118 + Math.max(0, dir.y) * 0.028;
-      p.set(dir.x * R * 1.08, dir.y * R + 0.045, dir.z * R * 0.95 - 0.03);
-      q.identity();
-      sc.setScalar(0.028 + rand() * 0.017);
-      m4.compose(p, q, sc);
-      curls.setMatrixAt(n++, m4);
+  if (who === 'cauan') {
+    // liso médio, repartido de lado, caindo até a altura do maxilar e cobrindo a nuca
+    const back = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.108, 32, 22, Math.PI, Math.PI, 0, 2.1), hairM));
+    back.scale.set(fw * 1.06, 1.1, 1.04);
+    back.position.set(0, 0.004, -0.014);
+    head.add(back);
+    const partX = 0.035;
+    for (let i = 0; i < 420; i++) {
+      const d = new THREE.Vector3(rand() * 2 - 1, rand() * 1.3 - 0.2, rand() * 2 - 1).normalize();
+      if (d.z > 0.35 && d.y < 0.62) continue; // rosto livre
+      if (d.y < 0.05 && d.z > -0.2) continue;  // não nasce mecha na frente da orelha
+      const away = d.x >= partX ? 1 : -1;
+      const flow = new THREE.Vector3(away * 0.8, -0.6, d.z > 0.2 ? 0.25 : -0.25);
+      const len = (d.z < -0.2 ? 0.11 : 0.08) + Math.max(0, d.y) * 0.1 + rand() * 0.03;
+      addLock(d, flow, len, 0.026 + rand() * 0.01, 0.004 + rand() * 0.012, 1.1);
     }
-    const core = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.115, 32, 24), hairM));
-    core.scale.set(1.06, 0.96, 0.92);
-    core.position.set(0, 0.05, -0.042);
-    head.add(core, curls);
+    // franja varrida para o lado, por cima da testa (sem cobrir os olhos)
+    for (let i = 0; i < 14; i++) {
+      const d = new THREE.Vector3(-0.05 + i * 0.035 - 0.2, 0.9, 0.48).normalize();
+      addLock(d, new THREE.Vector3(-1, -0.1, 0.25), 0.06 + rand() * 0.015, 0.028, 0.012 + rand() * 0.004, 0.15);
+    }
+  } else {
+    // liso curto penteado para frente e um pouco para o lado, laterais rentes
+    for (let i = 0; i < 360; i++) {
+      const a = rand() * Math.PI * 2, b = Math.sqrt(rand()) * 1.55;
+      const d = new THREE.Vector3(Math.sin(b) * Math.cos(a), Math.cos(b), Math.sin(b) * Math.sin(a) - 0.18).normalize();
+      if (d.z > 0.45 && d.y < 0.62) continue;
+      const top = d.y > 0.55;
+      const flow = top ? new THREE.Vector3(-0.35, -0.1, 1) : new THREE.Vector3(0, -1, 0.15);
+      const len = top ? 0.05 + rand() * 0.025 : 0.025 + rand() * 0.012;
+      addLock(d, flow, len, 0.024 + rand() * 0.008, top ? 0.006 + rand() * 0.008 : 0.003, 0.15);
+    }
+    // franja curta com um pouco de volume na frente
+    for (let i = 0; i < 10; i++) {
+      const d = new THREE.Vector3(-0.2 + i * 0.045, 0.82, 0.55).normalize();
+      addLock(d, new THREE.Vector3(-0.45, -0.3, 1), 0.045 + rand() * 0.012, 0.026, 0.013, 0.2);
+    }
   }
+  const hairGeo = new THREE.BufferGeometry();
+  hairGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  hairGeo.setIndex(idx);
+  hairGeo.computeVertexNormals();
+  const strandsMesh = new THREE.Mesh(hairGeo, hairM.clone());
+  strandsMesh.material.side = THREE.DoubleSide;
+  strandsMesh.castShadow = true;
+  head.add(strandsMesh);
 
   // ── braços (posicionados a cada quadro pelo IK) ──
   const L1 = 0.29, L2 = 0.265;
