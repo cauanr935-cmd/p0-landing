@@ -918,7 +918,7 @@ function start() {
     });
 
     // Cauan e Bruno escrevendo no quadro
-    if (t < TL.cover[1] + 0.02) R.people.forEach((p) => p.update(time));
+    if (t < TL.cover[1] + 0.02) R.updateWriters(dt, time);
 
     // celular vibra de tempos em tempos enquanto estamos na sala
     if (time > nextBuzz && t < TL.cover[1]) {

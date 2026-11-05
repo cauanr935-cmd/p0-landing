@@ -8,13 +8,16 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 // barba, moletom azul-marinho e calça bege; Bruno de moletom preto com
 // estampa branca no peito, cabelo curto escuro e calça escura.
 export const LOOKS = {
+  // rostos e cabelos a partir da foto da escada: Cauan de pele morena escura,
+  // cachos volumosos, cavanhaque e bigode, óculos de armação escura; Bruno de
+  // pele morena clara, rosto fino, cabelo liso curto penteado para frente.
   cauan: {
-    height: 1.78, hoodie: '#27324f', hoodieDark: '#1b2338', pants: '#c3ad86', skin: '#b98563',
-    hair: '#17110d', hairStyle: 'curly', beard: true, glasses: true, freeArm: 'hip',
+    height: 1.78, hoodie: '#27324f', hoodieDark: '#1b2338', pants: '#c3ad86', skin: '#86573a',
+    hair: '#120d0a', hairStyle: 'curly', beard: true, glasses: true, freeArm: 'hip', faceW: 0.9,
   },
   bruno: {
-    height: 1.72, hoodie: '#1d1d21', hoodieDark: '#121215', pants: '#25272c', skin: '#c99677',
-    hair: '#16110d', hairStyle: 'short', beard: false, glasses: false, freeArm: 'hang', print: true,
+    height: 1.74, hoodie: '#1d1d21', hoodieDark: '#121215', pants: '#25272c', skin: '#c08c69',
+    hair: '#18120e', hairStyle: 'short', beard: false, glasses: false, freeArm: 'hang', print: true, faceW: 0.86,
   },
 };
 
@@ -139,93 +142,167 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
   }
 
   // ── pescoço, cabeça, rosto ──
-  const neck = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.12, 14), skin));
-  neck.position.y = 1.53;
+  const neck = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.052, 0.13, 16), skin));
+  neck.position.set(0, 1.53, -0.008);
   body.add(neck);
   const head = new THREE.Group();
-  head.position.y = 1.64;
+  head.position.y = 1.645;
   body.add(head);
-  const skull = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.105, 28, 20), skin));
-  skull.scale.set(0.93, 1.1, 1);
-  head.add(skull);
-  [-1, 1].forEach((s) => {
-    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), skin);
-    ear.scale.set(0.5, 1, 0.8);
-    ear.position.set(s * 0.098, -0.005, -0.005);
-    head.add(ear);
+  const fw = L.faceW;
+  // crânio + mandíbula + queixo: dá o formato de rosto, não de bola
+  const skull = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 24), skin));
+  skull.scale.set(fw, 1.1, 1.02);
+  skull.position.set(0, 0.012, -0.008);
+  const jaw = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.08, 28, 20), skin));
+  jaw.scale.set(fw * 1.02, 0.78, 1.0);
+  jaw.position.set(0, -0.045, 0.012);
+  const chin = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 12), skin);
+  chin.scale.set(1.1, 0.8, 0.9);
+  chin.position.set(0, -0.092, 0.06);
+  head.add(skull, jaw, chin);
+  const darker = std(new THREE.Color(L.skin).multiplyScalar(0.78).getStyle(), { roughness: 0.6 });
+  [-1, 1].forEach((sx) => {
+    // orelha com concha
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.024, 14, 10), skin);
+    ear.scale.set(0.42, 1.05, 0.75);
+    ear.position.set(sx * 0.093 * fw / 0.9, -0.004, -0.008);
+    ear.rotation.y = sx * 0.3;
+    const earIn = new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 8), darker);
+    earIn.scale.set(0.3, 0.9, 0.6);
+    earIn.position.set(sx * 0.098 * fw / 0.9, -0.004, -0.004);
+    // maçã do rosto
+    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 10), skin);
+    cheek.position.set(sx * 0.05, -0.012, 0.072);
+    // olhos: esclera, íris e pálpebra
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.0115, 14, 10), std('#f1ede6', { roughness: 0.3 }));
+    eye.position.set(sx * 0.034, 0.016, 0.083);
+    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.0062, 12, 8), std('#2a1a10', { roughness: 0.2 }));
+    iris.position.set(sx * 0.034, 0.015, 0.0935);
+    const lid = new THREE.Mesh(new THREE.SphereGeometry(0.0128, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), skin);
+    lid.position.copy(eye.position);
+    lid.rotation.x = 0.35;
+    // sobrancelha grossa
+    const brow = new THREE.Mesh(new THREE.CapsuleGeometry(0.004, 0.026, 4, 6), hair);
+    brow.rotation.z = Math.PI / 2 + sx * 0.12;
+    brow.position.set(sx * 0.036, 0.036, 0.092);
+    head.add(ear, earIn, cheek, eye, iris, lid, brow);
   });
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.04, 8), skin);
-  nose.rotation.x = Math.PI / 2;
-  nose.position.set(0, -0.01, 0.105);
-  head.add(nose);
+  // nariz: dorso, ponta e asas
+  const bridgeN = new THREE.Mesh(new THREE.CapsuleGeometry(0.008, 0.03, 4, 8), skin);
+  bridgeN.rotation.x = 0.35;
+  bridgeN.position.set(0, 0.0, 0.098);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.014, 12, 10), skin);
+  tip.scale.set(1.15, 0.9, 1);
+  tip.position.set(0, -0.022, 0.104);
+  [-1, 1].forEach((sx) => {
+    const wing = new THREE.Mesh(new THREE.SphereGeometry(0.009, 10, 8), skin);
+    wing.position.set(sx * 0.013, -0.026, 0.097);
+    head.add(wing);
+  });
+  // boca
+  const lips = new THREE.Mesh(new THREE.CapsuleGeometry(0.0055, 0.028, 4, 8), std(new THREE.Color(L.skin).multiplyScalar(0.7).getStyle(), { roughness: 0.5 }));
+  lips.rotation.z = Math.PI / 2;
+  lips.position.set(0, -0.052, 0.088);
+  head.add(bridgeN, tip, lips);
+
   if (L.beard) {
-    const beard = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.45), hair));
-    beard.scale.set(1.02, 1.05, 1.02);
-    beard.position.set(0, -0.01, 0.012);
-    head.add(beard);
+    // cavanhaque, bigode e barba rala no maxilar
+    const beardM = std(L.hair, { roughness: 0.9 });
+    const goatee = new THREE.Mesh(new THREE.SphereGeometry(0.032, 16, 12), beardM);
+    goatee.scale.set(1.05, 1.1, 0.75);
+    goatee.position.set(0, -0.085, 0.07);
+    const mustache = new THREE.Mesh(new THREE.CapsuleGeometry(0.007, 0.034, 4, 8), beardM);
+    mustache.rotation.z = Math.PI / 2;
+    mustache.position.set(0, -0.039, 0.098);
+    head.add(goatee, mustache);
+    [-1, 1].forEach((sx) => {
+      const jawBeard = new THREE.Mesh(new THREE.SphereGeometry(0.05, 14, 10, 0, Math.PI * 2, Math.PI * 0.4, Math.PI * 0.4), beardM);
+      jawBeard.scale.set(0.6, 1, 1);
+      jawBeard.position.set(sx * 0.047, -0.04, 0.02);
+      jawBeard.rotation.y = sx * 0.5;
+      head.add(jawBeard);
+    });
   }
   if (L.glasses) {
-    const frameM = std('#151515', { roughness: 0.3, metalness: 0.4 });
-    [-1, 1].forEach((s) => {
-      const lens = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.004, 6, 20), frameM);
-      lens.position.set(s * 0.037, 0.018, 0.103);
-      const temple = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.004, 0.1), frameM);
-      temple.position.set(s * 0.093, 0.02, 0.055);
-      head.add(lens, temple);
+    const frameM = std('#121212', { roughness: 0.3, metalness: 0.3 });
+    const lensM = new THREE.MeshStandardMaterial({ color: '#2a2f38', roughness: 0.05, metalness: 0.2, transparent: true, opacity: 0.45 });
+    [-1, 1].forEach((sx) => {
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.022, 0.0035, 8, 24), frameM);
+      rim.scale.set(1.15, 0.85, 1);
+      rim.position.set(sx * 0.035, 0.016, 0.104);
+      const lens = new THREE.Mesh(new THREE.CircleGeometry(0.022, 20), lensM);
+      lens.scale.set(1.15, 0.85, 1);
+      lens.position.set(sx * 0.035, 0.016, 0.104);
+      const temple = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.005, 0.105), frameM);
+      temple.position.set(sx * 0.088 * fw / 0.9, 0.02, 0.054);
+      temple.rotation.y = -sx * 0.06;
+      head.add(rim, lens, temple);
     });
-    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.004, 0.004), frameM);
-    bridge.position.set(0, 0.022, 0.106);
-    head.add(bridge);
+    const bridgeG = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.004, 0.004), frameM);
+    bridgeG.position.set(0, 0.02, 0.107);
+    head.add(bridgeG);
   }
 
   // ── cabelo ──
   let seed = who === 'cauan' ? 11 : 23;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const hairBase = new THREE.Color(L.hair);
+  const tint = (amt) => hairBase.clone().offsetHSL(0, 0, (rand() - 0.5) * amt);
   if (L.hairStyle === 'short') {
-    const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.114, 28, 18, 0, Math.PI * 2, 0, 2.05), hair));
-    cap.scale.set(0.97, 1.1, 1.04);
-    cap.rotation.x = -0.62;
-    cap.position.set(0, 0.012, -0.006);
+    // base rente (degradê nas laterais e nuca) + mechas lisas penteadas para frente no topo
+    const capMat = std(L.hair, { roughness: 0.85 });
+    const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.104, 32, 20, 0, Math.PI * 2, 0, 1.95), capMat));
+    cap.scale.set(fw * 1.03, 1.1, 1.05);
+    cap.rotation.x = -0.75;
+    cap.position.set(0, 0.016, -0.012);
     head.add(cap);
-    const tuft = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.02, 0), hair, 90);
-    const m = new THREE.Matrix4();
-    for (let i = 0; i < 90; i++) {
-      const a = rand() * Math.PI * 2, b = rand() * 1.25;
-      const dir = new THREE.Vector3(Math.sin(b) * Math.cos(a), Math.cos(b), Math.sin(b) * Math.sin(a) - 0.15).normalize();
-      m.makeTranslation(dir.x * 0.112, dir.y * 0.118 + 0.01, dir.z * 0.112);
-      tuft.setMatrixAt(i, m);
+    const N = 260;
+    const strands = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.0055, 0.04, 3, 6), std('#ffffff', { roughness: 0.7 }), N);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), sc = new THREE.Vector3(1, 1, 1);
+    const fwd = new THREE.Vector3(0, -0.15, 1).normalize();
+    for (let i = 0; i < N; i++) {
+      // pontos no topo da cabeça (até ~60° do alto), um pouco para trás
+      const a = rand() * Math.PI * 2, b = Math.sqrt(rand()) * 1.05;
+      const dir = new THREE.Vector3(Math.sin(b) * Math.cos(a) * fw, Math.cos(b), Math.sin(b) * Math.sin(a) - 0.1).normalize();
+      p.set(dir.x * 0.112, dir.y * 0.12 + 0.012, dir.z * 0.112 - 0.01);
+      // mecha deitada na superfície, apontando para a testa
+      const along = fwd.clone().sub(dir.clone().multiplyScalar(fwd.dot(dir))).normalize();
+      q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), along.lerp(dir, 0.15).normalize());
+      sc.set(1, 0.7 + rand() * 0.6, 1);
+      m.compose(p, q, sc);
+      strands.setMatrixAt(i, m);
+      strands.setColorAt(i, tint(0.08));
     }
-    tuft.castShadow = true;
-    head.add(tuft);
+    strands.castShadow = true;
+    head.add(strands);
   } else {
-    // cachos: casca de bolinhas por cima e atrás da cabeça, caindo até o ombro
-    const N = 420;
-    const curls = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), hair, N);
+    // cachos volumosos (black power curto): várias camadas de cachinhos,
+    // mais volume em cima e nos lados, rente na nuca
+    const N = 900;
+    const curls = new THREE.InstancedMesh(new THREE.TorusKnotGeometry(1, 0.42, 16, 4, 2, 3), std('#ffffff', { roughness: 0.8 }), N);
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
     let n = 0;
     while (n < N) {
-      let px, py, pz;
-      if (n < 260) {
-        const dir = new THREE.Vector3(rand() * 2 - 1, rand() * 2 - 1, rand() * 2 - 1).normalize();
-        if (dir.z > 0.35 && dir.y < 0.55) continue; // deixa o rosto livre
-        if (dir.y < -0.35) continue;
-        const r = 0.112 + rand() * 0.018;
-        px = dir.x * r * 1.02; py = dir.y * r * 1.08 + 0.015; pz = dir.z * r - 0.005;
-      } else {
-        // cortina de cachos atrás e dos lados, até a altura do ombro
-        const ang = (rand() * 1.6 - 0.8) * Math.PI + Math.PI; // em volta da nuca
-        if (Math.cos(ang) > 0.55) continue;
-        const r = 0.105 + rand() * 0.03;
-        px = Math.sin(ang) * r; pz = Math.cos(ang) * r * 0.95 - 0.01;
-        py = -0.02 - rand() * 0.17;
-      }
-      const size = 0.017 + rand() * 0.011;
-      p.set(px, py, pz);
-      q.setFromEuler(new THREE.Euler(rand() * 3, rand() * 3, 0));
-      sc.setScalar(size);
+      const dir = new THREE.Vector3(rand() * 2 - 1, rand() * 2 - 1, rand() * 2 - 1).normalize();
+      // rosto livre, com a linha do cabelo um pouco acima da testa
+      if (dir.z > 0.2 && dir.y < 0.62) continue;
+      if (dir.y < -0.5) continue;
+      if (dir.y < -0.15 && dir.z > -0.2) continue; // costeletas curtas
+      const layer = rand();
+      const volume = 0.11 + layer * 0.05 + Math.max(0, dir.y) * 0.03;
+      p.set(dir.x * volume * 1.05, dir.y * volume * 1.05 + 0.03, dir.z * volume - 0.012);
+      q.setFromEuler(new THREE.Euler(rand() * 6, rand() * 6, rand() * 6));
+      sc.setScalar(0.0085 + rand() * 0.007);
       m.compose(p, q, sc);
-      curls.setMatrixAt(n++, m);
+      curls.setMatrixAt(n, m);
+      curls.setColorAt(n, tint(0.1));
+      n++;
     }
+    // miolo escuro por baixo dos cachos, para não aparecer couro cabeludo
+    const core = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.128, 24, 18), std(L.hair, { roughness: 1 })));
+    core.scale.set(1.02, 1.05, 1.04);
+    core.position.set(0, 0.03, -0.022);
+    head.add(core);
     curls.castShadow = true;
     head.add(curls);
   }
@@ -263,27 +340,24 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
     return fDir;
   }
 
-  function update(time) {
+  // pen: { target: Vector3 (no espaço do personagem), down: bool } ou null
+  function update(time, pen = null) {
     const t = time + phase * 10;
-    // corpo acompanha a escrita
-    body.rotation.y = -0.12 + Math.sin(t * 0.55) * 0.06;
+    body.rotation.y = -0.12 + Math.sin(t * 0.55) * 0.05;
     body.rotation.x = 0.04;
     body.updateMatrix();
-    head.rotation.set(-0.12 + Math.sin(t * 0.7) * 0.03, -0.18 + Math.sin(t * 0.4) * 0.08, Math.sin(t * 0.5) * 0.04);
+    head.rotation.set(-0.1 + Math.sin(t * 0.7) * 0.03, -0.2 + Math.sin(t * 0.4) * 0.06, Math.sin(t * 0.5) * 0.04);
 
-    // a caneta anda da esquerda para a direita, linha por linha
-    const speed = 0.16;
-    const cycle = t * speed;
-    const line = Math.floor(cycle) % 3;
-    const prog = cycle - Math.floor(cycle);
-    const lift = prog > 0.92 ? Math.sin(((prog - 0.92) / 0.08) * Math.PI) * 0.04 : 0;
-    tmpT.set(
-      0.02 - 0.3 * prog,
-      1.74 - line * 0.08 + Math.sin(t * 13) * 0.012 + Math.sin(t * 5.3) * 0.008 + lift,
-      boardZ - 0.07 - lift * 0.6,
-    );
+    if (pen) {
+      tmpT.copy(pen.target);
+      if (!pen.down) tmpT.z -= 0.05 / k;
+      // olha para onde está escrevendo
+      head.rotation.x = THREE.MathUtils.clamp((1.64 - tmpT.y) * 0.9, -0.35, 0.5) * -1 - 0.05;
+    } else {
+      tmpT.set(0.02 - 0.15 * (Math.sin(t * 0.3) * 0.5 + 0.5), 1.6, boardZ - 0.07);
+    }
     const fDir = poseArm(writing, tmpT.clone(), new THREE.Vector3(-1, -0.7, -0.5).normalize());
-    marker.position.copy(tmpT).addScaledVector(fDir, 0.04);
+    marker.position.copy(tmpT).addScaledVector(fDir, 0.045);
     marker.quaternion.setFromUnitVectors(UP, new THREE.Vector3(fDir.x * 0.4, fDir.y * 0.4, 1).normalize());
 
     if (L.freeArm === 'hip') {
@@ -294,6 +368,8 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
       poseArm(free, tmpT.clone(), new THREE.Vector3(0.3, 0, -1).normalize());
     }
   }
+  // distância do quadro em coordenadas do personagem (para a mão encostar)
+  const handZ = boardZ - 0.065 / k;
   update(0);
-  return { root, update };
+  return { root, update, scale: k, handZ };
 }

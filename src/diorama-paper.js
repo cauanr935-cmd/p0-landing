@@ -477,38 +477,29 @@ export function drawCover(ctx, w, h) {
   ctx.restore();
 }
 
+// O que já está escrito no quadro. O resto, Cauan e Bruno escrevem ao vivo
+// (roteiro em BOARD_LINES, em diorama-room.js).
 export function drawWhiteboard(ctx, w, h) {
   const rand = seeded(5);
   ctx.fillStyle = '#f7f8fa';
   ctx.fillRect(0, 0, w, h);
-  // restos de marcador apagado
   for (let i = 0; i < 18; i++) {
     ctx.fillStyle = `rgba(40,60,120,${0.02 + rand() * 0.03})`;
     ctx.fillRect(rand() * w, rand() * h, 120 + rand() * 360, 20 + rand() * 50);
   }
-  // coluna da esquerda: a sprint
   ctx.font = '88px "Caveat Brush"';
   ctx.fillStyle = '#1f3a8a';
   ctx.fillText('SPRINT · build in public', 60, 130);
   ctx.font = '600 60px "Caveat"';
   ctx.fillStyle = '#222';
-  ctx.fillText('☐ fechar as 10 mentorias', 80, 250);
-  ctx.fillText('☑ registro #007 no ar', 80, 330);
-  ctx.fillText('☑ transcritor (WhisperX)', 80, 410);
-  ctx.fillStyle = RED;
-  ctx.fillText('abrir pra todo mundo?', 80, 510);
-  ctx.fillText('→ ainda não', 120, 580);
-  ctx.fillStyle = '#1f3a8a';
-  ctx.font = '600 56px "Caveat"';
-  ctx.fillText('10:00 – 17:30  MIT', 80, 720);
-  // divisória à mão
+  ctx.fillText('☑ registro #007 no ar', 80, 250);
+  ctx.fillText('☑ transcritor (WhisperX)', 80, 330);
   ctx.strokeStyle = '#1f3a8a';
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(w * 0.53, 60);
   for (let y = 60; y <= h - 60; y += 40) ctx.lineTo(w * 0.53 + (rand() - 0.5) * 6, y);
   ctx.stroke();
-  // coluna da direita: next steps
   ctx.font = '92px "Caveat Brush"';
   ctx.fillStyle = '#111';
   ctx.fillText('NEXT STEPS', w * 0.57, 130);
@@ -516,17 +507,10 @@ export function drawWhiteboard(ctx, w, h) {
   ctx.strokeStyle = '#111';
   ctx.beginPath(); ctx.moveTo(w * 0.57, 150); ctx.lineTo(w * 0.57 + 470, 156); ctx.stroke();
   ctx.font = '600 58px "Caveat"';
-  [
-    ['• reunião', 'horas complementares'],
-    ['• reunião MIT', '10 mentorias antes de lançar'],
-    ['• analisador de áudio', 'vozes sobrepostas'],
-  ].forEach(([a, b], i) => {
-    const y = 270 + i * 190;
-    ctx.fillStyle = '#111';
-    ctx.fillText(a, w * 0.58, y);
-    ctx.fillStyle = '#1f3a8a';
-    ctx.fillText(b, w * 0.61, y + 66);
-  });
+  ctx.fillStyle = '#111';
+  ctx.fillText('• reunião', w * 0.58, 270);
+  ctx.fillStyle = '#1f3a8a';
+  ctx.fillText('horas complementares', w * 0.61, 336);
 }
 
 // Cauan e Bruno de costas, escrevendo no quadro, como figurinhas de papel

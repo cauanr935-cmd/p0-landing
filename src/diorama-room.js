@@ -392,9 +392,13 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   switchPlate.position.set(-0.85, 1.25, ZB + 0.006);
   pod.add(switchPlate);
 
-  const [wbC, wbX] = paper.makeCanvas(1600, 900);
-  paper.drawWhiteboard(wbX, 1600, 900);
-  const boardFace = std('#ffffff', { map: canvasTex(wbC), roughness: 0.22, metalness: 0.05 });
+  const BW = 1600, BH = 900;
+  const [wbC, wbX] = paper.makeCanvas(BW, BH);
+  const [baseC, baseX] = paper.makeCanvas(BW, BH);
+  paper.drawWhiteboard(baseX, BW, BH);
+  wbX.drawImage(baseC, 0, 0);
+  const boardTex = canvasTex(wbC);
+  const boardFace = std('#ffffff', { map: boardTex, roughness: 0.22, metalness: 0.05 });
   const boardEdge = std('#e3e5e8', { roughness: 0.4 });
   const whiteboard = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.95, 1.12, 0.025, 5, 0.012), [boardEdge, boardEdge, boardEdge, boardEdge, boardFace, boardEdge]));
   whiteboard.rotation.y = -Math.PI / 2;
@@ -568,13 +572,119 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   // ── Cauan e Bruno em 3D, escrevendo no quadro ──
   const writersGroup = new THREE.Group();
   pod.add(writersGroup);
-  const people = [['bruno', -0.85, 0], ['cauan', -0.02, 0.37]].map(([who, z, phase]) => {
+  // O que cada um escreve no quadro, linha por linha (coordenadas do quadro, em px).
+  const BOARD_LINES = {
+    bruno: [
+      { text: '☐ fechar as 10 mentorias', x: 80, y: 420, color: '#222' },
+      { text: '☐ deploy do bot no Slack', x: 80, y: 500, color: '#222' },
+      { text: 'abrir pra todo mundo?', x: 80, y: 600, color: '#d2372b' },
+      { text: '→ ainda não', x: 120, y: 670, color: '#d2372b' },
+    ],
+    cauan: [
+      { text: '• reunião MIT', x: 928, y: 460, color: '#111' },
+      { text: '10:00 – 17:30', x: 976, y: 526, color: '#1f3a8a' },
+      { text: '• registro #008', x: 928, y: 640, color: '#111' },
+      { text: '• EP 03 no YouTube', x: 928, y: 730, color: '#111' },
+    ],
+  };
+  const FONT = '600 58px "Caveat"';
+  wbX.font = FONT;
+  Object.values(BOARD_LINES).forEach((lines) => lines.forEach((l) => { l.w = wbX.measureText(l.text).width; }));
+  const boardX = x1 - 0.016 - 0.0125; // face do quadro, no espaço da sala
+  const toPod = (px, py) => new THREE.Vector3(boardX, 1.52 + (0.5 - py / BH) * 1.12, -0.35 + (px / BW - 0.5) * 1.95);
+
+  const people = [['bruno', -0.85, 0, [-1.4, -0.6]], ['cauan', -0.02, 0.37, [-0.3, 0.45]]].map(([who, z, phase, range]) => {
     const person = buildPerson(who, { std, shadowy, boardDistance: 0.44, phase });
     person.root.rotation.y = Math.PI / 2;
     person.root.position.set(x1 - 0.47, 0, z);
     writersGroup.add(person.root);
+    person.who = who;
+    person.range = range;
+    person.state = { line: 0, prog: 0, mode: 'travel', timer: 0.6 + phase * 2, fade: 1 };
     return person;
   });
+
+  // Avança a escrita, desenha o quadro e posiciona a mão de cada um na caneta.
+  const SPEED = 120; // px por segundo
+  const inv = new THREE.Matrix4();
+  let redraw = 0;
+  function updateWriters(dt, time) {
+    let dirty = false;
+    people.forEach((p) => {
+      const lines = BOARD_LINES[p.who];
+      const st = p.state;
+      const ln = lines[st.line];
+      st.timer -= dt;
+      if (st.mode === 'write') {
+        st.prog += SPEED * dt;
+        dirty = true;
+        if (st.prog >= ln.w) {
+          st.prog = ln.w;
+          if (st.line < lines.length - 1) { st.mode = 'travel'; st.timer = 0.7; }
+          else { st.mode = 'hold'; st.timer = 7; }
+        }
+      } else if (st.mode === 'travel' && st.timer <= 0) {
+        if (st.prog >= ln.w && st.line < lines.length - 1) st.line++;
+        st.prog = 0;
+        st.mode = 'write';
+      } else if (st.mode === 'hold' && st.timer <= 0) {
+        st.mode = 'erase';
+        st.timer = 1.2;
+      } else if (st.mode === 'erase') {
+        st.fade = Math.max(0, st.timer / 1.2);
+        dirty = true;
+        if (st.timer <= 0) { st.line = 0; st.prog = 0; st.fade = 1; st.mode = 'travel'; st.timer = 1.5; }
+      }
+
+      // caneta: no fim do texto já escrito, tremendo como letra
+      const cur = lines[st.line];
+      const writingNow = st.mode === 'write';
+      let px = cur.x + st.prog, py = cur.y - 24;
+      if (writingNow) py += Math.sin(time * 17) * 11 + Math.cos(time * 7.5) * 5;
+      if (st.mode === 'travel') {
+        // caneta levantada, indo do fim de uma linha para o começo da próxima
+        const next = st.prog >= cur.w && lines[st.line + 1] ? lines[st.line + 1] : cur;
+        const from = st.prog >= cur.w ? [cur.x + cur.w, cur.y] : [cur.x, cur.y];
+        const k2 = 1 - Math.max(0, st.timer) / 0.7;
+        const e = k2 * k2 * (3 - 2 * k2);
+        px = from[0] + (next.x - from[0]) * e;
+        py = from[1] + (next.y - from[1]) * e - 24 - Math.sin(Math.PI * e) * 30;
+      }
+      const target = toPod(px, py);
+      // o corpo acompanha a caneta pela lousa (a mão direita fica à frente)
+      const wantZ = THREE.MathUtils.clamp(target.z - 0.17 * p.scale, p.range[0], p.range[1]);
+      p.root.position.z += (wantZ - p.root.position.z) * Math.min(1, dt * 1.8);
+      p.root.updateMatrix();
+      inv.copy(p.root.matrix).invert();
+      const local = target.clone().applyMatrix4(inv);
+      local.z = p.handZ;
+      p.update(time, { target: local, down: writingNow });
+    });
+
+    redraw -= dt;
+    if (dirty && redraw <= 0) {
+      redraw = 1 / 24;
+      wbX.drawImage(baseC, 0, 0);
+      wbX.font = FONT;
+      people.forEach((p) => {
+        const st = p.state;
+        BOARD_LINES[p.who].forEach((l, i) => {
+          if (i > st.line) return;
+          const shown = i < st.line ? l.w : st.mode === 'travel' && st.prog < l.w ? 0 : st.prog;
+          if (shown <= 0) return;
+          wbX.save();
+          wbX.globalAlpha = st.fade;
+          wbX.beginPath();
+          wbX.rect(l.x - 20, l.y - 70, shown + 20, 100);
+          wbX.clip();
+          wbX.fillStyle = l.color;
+          wbX.fillText(l.text, l.x, l.y);
+          wbX.restore();
+        });
+      });
+      boardTex.needsUpdate = true;
+    }
+  }
   clickable(writersGroup, 'Cauan e Bruno na lousa', () => bubbleAt(writersGroup, 'Planejando os next steps. Ninguém apaga o quadro antes de tirar foto.'));
 
   // mochila cinza largada numa cadeira, como no vídeo
@@ -599,6 +709,8 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     onTable,
     duct,
     people,
+    updateWriters,
+    boardCanvas: wbC,
     key,
     lamp,
     roof,
