@@ -936,7 +936,8 @@ function start() {
     const s = 1 - ease(Math.min(1, pull * 1.7)) * 0.985;
     room.scale.setScalar(s);
     key.intensity = 7 * s * s + 0.3;
-    R.roof.visible = t < TL.pull[0] + 0.004;
+    // no afastamento, só a sala fica: telhado, prédio e duto saem enquanto a câmera olha o caderno
+    R.roof.visible = R.outside.visible = t < TL.pull[0] + 0.004;
     R.door.rotation.y = -1.35 * ease(seg(t, [0.045, 0.1]));
     coneMat.uniforms.uOpacity.value = s;
     mapMat.opacity = ease(seg(t, [0.885, 0.95]));
