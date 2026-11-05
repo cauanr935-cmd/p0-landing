@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import * as paper from './diorama-paper.js';
+import { buildPerson } from './diorama-people.js';
 
 // Medidas (metros). Frente de vidro em +z, TV ao fundo em -z.
 // A sala é desenhada centrada em x = 0 e depois deslocada em `cx`, para a mesa
@@ -564,45 +565,40 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   cableCover.position.set(0.45, onTable + 0.002, -0.5);
   furniture.add(cableCover);
 
-  // ── Cauan e Bruno escrevendo no quadro (figurinhas de papel em tamanho real) ──
-  const writers = [];
-  [['cauan', 1.74, -0.78, 0.0], ['bruno', 1.7, 0.02, 1.7]].forEach(([who, H, z, phase]) => {
-    const g = new THREE.Group();
-    const [bc, bx] = paper.makeCanvas(600, 1500);
-    paper.drawPersonBack(bx, 600, 1500, who);
-    const bodyTex = canvasTex(bc);
-    const bodyGeo = new THREE.PlaneGeometry(H * 0.4, H);
-    bodyGeo.translate(0, H / 2, 0);
-    const body = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ map: bodyTex, alphaTest: 0.5, roughness: 0.9 }));
-    g.add(body);
-    const [ac, ax] = paper.makeCanvas(400, 600);
-    paper.drawPersonBack(ax, 400, 600, who, { arm: true });
-    // o braço sai do ombro direito (de quem vê) e sobe até o quadro
-    const armH = H * 0.36, armW = armH * (400 / 600);
-    const arm = new THREE.Group();
-    arm.position.set(H * 0.165, H * 0.775, 0.004);
-    const armMesh = new THREE.Mesh(new THREE.PlaneGeometry(armW, armH), new THREE.MeshStandardMaterial({ map: canvasTex(ac), alphaTest: 0.5, roughness: 0.9 }));
-    armMesh.position.set(armW * (0.5 - 0.26), armH * (0.5 - 0.07), 0);
-    arm.add(armMesh);
-    arm.rotation.z = -0.1;
-    g.add(arm);
-    g.rotation.y = -Math.PI / 2;
-    g.position.set(x1 - 0.42, 0, z);
-    g.userData = { arm, phase };
-    pod.add(g);
-    writers.push(g);
-  });
+  // ── Cauan e Bruno em 3D, escrevendo no quadro ──
   const writersGroup = new THREE.Group();
   pod.add(writersGroup);
-  writers.forEach((w) => writersGroup.add(w));
+  const people = [['bruno', -0.85, 0], ['cauan', -0.02, 0.37]].map(([who, z, phase]) => {
+    const person = buildPerson(who, { std, shadowy, boardDistance: 0.44, phase });
+    person.root.rotation.y = Math.PI / 2;
+    person.root.position.set(x1 - 0.47, 0, z);
+    writersGroup.add(person.root);
+    return person;
+  });
   clickable(writersGroup, 'Cauan e Bruno na lousa', () => bubbleAt(writersGroup, 'Planejando os next steps. Ninguém apaga o quadro antes de tirar foto.'));
+
+  // mochila cinza largada numa cadeira, como no vídeo
+  const bagMat = std('#4a4d52', { roughness: 0.9 });
+  const bag = new THREE.Group();
+  const bagBody = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.32, 0.42, 0.17, 4, 0.06), bagMat));
+  bagBody.position.y = 0.21;
+  const pocket = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.24, 0.2, 0.06, 3, 0.03), std('#3c3f44', { roughness: 0.9 })));
+  pocket.position.set(0, 0.14, 0.1);
+  const zip = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.008, 0.008), std('#1a1a1a'));
+  zip.position.set(0, 0.25, 0.132);
+  const handleTop = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 6, 16, Math.PI), bagMat);
+  handleTop.position.set(0, 0.42, 0);
+  bag.add(bagBody, pocket, zip, handleTop);
+  bag.position.set(-0.38, 0.5, 1.0);
+  bag.rotation.set(-0.35, 0.3, 0.08);
+  furniture.add(bag);
 
   clickable(shellGroup, 'Sala R07 · escritório da Be My Mentor (às vezes)', () => bubbleAt(shellGroup, 'Sala R07 do Inteli: o escritório da Be My Mentor, às vezes.'));
 
   return {
     onTable,
     duct,
-    writers,
+    people,
     key,
     lamp,
     roof,

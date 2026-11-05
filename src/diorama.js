@@ -153,7 +153,17 @@ function start() {
   const lidSticker = new THREE.Mesh(new THREE.CircleGeometry(0.03, 24), std('#7c3aed', { roughness: 0.6 }));
   lidSticker.position.set(0.06, 0.14, -0.0056);
   lidSticker.rotation.y = Math.PI;
-  lid.add(lidBox, lscreen, lidSticker);
+  // adesivos nas costas da tampa, como o notebook do vídeo
+  [['#f2c94c', -0.1, 0.16, 0.022], ['#e86a5a', -0.03, 0.06, 0.018], ['#5fb3ad', 0.11, 0.06, 0.02], ['#ffffff', -0.11, 0.06, 0.016], ['#1f3a8a', 0.02, 0.18, 0.015]].forEach(([c, x, y, r]) => {
+    const st = new THREE.Mesh(new THREE.CircleGeometry(r, 20), std(c, { roughness: 0.6 }));
+    st.position.set(x, y, -0.0056);
+    st.rotation.y = Math.PI;
+    lid.add(st);
+  });
+  const wanted = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.035), std('#e9dcc0', { roughness: 0.7 }));
+  wanted.position.set(0.12, 0.17, -0.0056);
+  wanted.rotation.y = Math.PI;
+  lid.add(lidBox, lscreen, lidSticker, wanted);
   lid.position.set(0, 0.008, -0.12);
   lid.rotation.x = -0.32;
   laptop.add(lbase, keys, lid);
@@ -599,8 +609,8 @@ function start() {
     const L = bookShot(-1), R = bookShot(1), C = bookShot(0);
     const list = [
       [0, far({ pos: V(3.4, 1.65, 6.0), look: V(0.85, 1.3, 0.6) }, 1.3)],
-      [TL.intro.wide[1], far({ pos: V(1.62, 1.5, 2.75), look: V(1.2, 1.1, 0) }, 1.3)],
-      [(TL.intro.wide[1] + TL.intro.table[1]) / 2, { pos: V(1.0, 1.5, 1.45), look: V(2.1, 1.2, -0.45) }],
+      [TL.intro.wide[1], far({ pos: V(1.6, 1.5, 2.2), look: V(1.25, 1.15, 0) }, 1.15)],
+      [(TL.intro.wide[1] + TL.intro.table[1]) / 2, { pos: V(0.35, 1.6, 0.9), look: V(2.0, 1.25, -0.45) }],
       [TL.intro.table[1], far({ pos: V(0.55, 1.18, 0.95), look: V(0, onTable + 0.08, -0.1) }, 1.45)],
       [TL.cover[1], C],
     ];
@@ -908,10 +918,7 @@ function start() {
     });
 
     // Cauan e Bruno escrevendo no quadro
-    R.writers.forEach((w) => {
-      const a = w.userData.arm;
-      a.rotation.z = -0.1 + Math.sin(time * 3.1 + w.userData.phase) * 0.07 + Math.sin(time * 7.3 + w.userData.phase) * 0.02;
-    });
+    if (t < TL.cover[1] + 0.02) R.people.forEach((p) => p.update(time));
 
     // celular vibra de tempos em tempos enquanto estamos na sala
     if (time > nextBuzz && t < TL.cover[1]) {
