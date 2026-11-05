@@ -93,6 +93,10 @@ Os planos pagos das mesmas ferramentas são ativados somente quando o volume exi
 - Legendas, voto e newsletter são HTML por cima do canvas (`.cap` com `data-from`/`data-to` em fração do scroll).
 - Sem WebGL ou com "reduzir movimento", a página mostra só o conteúdo (`.no-3d`).
 - Fontes de mão (Caveat Brush, Caveat) vêm de `@fontsource`, servidas pelo próprio site.
+- Objetos clicáveis (figurinhas, celular, notebook, caneca, quadro, polaroids) usam `clickable()` em `src/diorama.js`; o balão é HTML posicionado sobre o objeto.
+- Sons são sintetizados em `src/diorama-audio.js` e só tocam com o botão de som ligado.
+- **Você decide:** `POST /api/vote` (`api/vote.js`) soma o voto na aba "Votos" da mesma planilha da newsletter. Depois de atualizar `google-apps-script.gs`, publique uma **nova versão** da implantação do Apps Script; sem isso o carimbo funciona, só não aparece a porcentagem.
+- Registro novo: além da página e da lista, acrescente um capítulo em `src/diorama-content.js` (o #008 em branco vai para o fim).
 
 ## Linha do tempo de conteúdos (`linha-do-tempo.html`)
 

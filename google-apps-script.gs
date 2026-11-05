@@ -2,7 +2,9 @@
  * Guarda os assinantes da newsletter numa aba "Newsletter" da planilha
  * onde este script estiver vinculado. Colunas: Data | E-mail | Status.
  *
- * Ações aceitas no POST (JSON): subscribe, unsubscribe, list.
+ * Ações aceitas no POST (JSON): subscribe, unsubscribe, list e vote.
+ * "vote" soma um voto do "Você decide" da home numa aba "Votos"
+ * (colunas: Enquete | sim | nao) e devolve a contagem atual.
  * Todas exigem o campo "secret" igual à propriedade SHARED_SECRET do script.
  *
  * Setup:
@@ -74,8 +76,13 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    var sheet = getSheet_();
     var action = data.action || 'subscribe';
+
+    if (action === 'vote') {
+      return json_(vote_(String(data.poll || ''), String(data.choice || '')));
+    }
+
+    var sheet = getSheet_();
 
     if (action === 'list') {
       var last = sheet.getLastRow();
@@ -115,4 +122,31 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// Soma um voto e devolve { ok, sim, nao } da enquete.
+function vote_(poll, choice) {
+  if (!/^[a-z0-9-]{1,20}$/.test(poll) || (choice !== 'sim' && choice !== 'nao')) {
+    return { ok: false, error: 'voto inválido' };
+  }
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Votos') || ss.insertSheet('Votos');
+  if (sheet.getLastRow() === 0) sheet.appendRow(['Enquete', 'sim', 'nao']);
+  var last = sheet.getLastRow();
+  var row = 0;
+  if (last >= 2) {
+    var polls = sheet.getRange(2, 1, last - 1, 1).getValues();
+    for (var i = 0; i < polls.length; i++) {
+      if (String(polls[i][0]) === poll) { row = i + 2; break; }
+    }
+  }
+  if (!row) {
+    sheet.appendRow([poll, 0, 0]);
+    row = sheet.getLastRow();
+  }
+  var col = choice === 'sim' ? 2 : 3;
+  var cell = sheet.getRange(row, col);
+  cell.setValue(Number(cell.getValue() || 0) + 1);
+  var counts = sheet.getRange(row, 2, 1, 2).getValues()[0];
+  return { ok: true, sim: Number(counts[0]) || 0, nao: Number(counts[1]) || 0 };
 }

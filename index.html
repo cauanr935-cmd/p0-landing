@@ -86,7 +86,7 @@
 
   /* Palco: o canvas fica fixo e a altura do #stage vira o "tempo" da cena */
   #scene { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
-  #stage { position: relative; height: 1000vh; }
+  #stage { position: relative; height: 1500vh; }
   #progress {
     position: fixed; left: 0; right: 0; bottom: 0; height: 3px; z-index: 30;
     background: var(--stage-accent); transform-origin: left; transform: scaleX(0);
@@ -172,7 +172,7 @@
     transform: rotate(-2deg);
   }
   .subscribe-form button:disabled { opacity: .6; }
-  .subscribe-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .cap .subscribe-form .hp, .subscribe-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
   .subscribe-status { width: 100%; font: 700 18px 'Caveat', cursive; min-height: 1em; }
   .subscribe-status[data-kind="error"] { color: var(--ink-red); }
   .subscribe-status[data-kind="success"] { color: var(--ink-green); }
@@ -180,6 +180,65 @@
 
   .scroll-hint { font-family: 'Caveat', cursive; font-weight: 700; font-size: 20px; color: var(--stage-muted); margin-top: 10px; animation: bob 1.6s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(5px); } }
+
+  /* Link do capítulo, contador, dicas, balão e som */
+  .chip-cap {
+    bottom: calc(5vh + env(safe-area-inset-bottom, 0px));
+    font: 700 20px 'Caveat', cursive;
+    color: var(--ink);
+    background: var(--paper);
+    padding: 8px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 8px 24px -8px var(--stage-bg);
+  }
+  .chip-cap:hover { background: var(--stage-accent); color: #fff; }
+  .chapter-count {
+    position: fixed; z-index: 20; top: calc(70px + env(safe-area-inset-top, 0px)); right: 22px;
+    font: 22px 'Caveat Brush', cursive; color: var(--stage-muted);
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .chapter-count.is-on { opacity: 1; }
+  .hint-touch { display: none !important; }
+  @media (hover: none) { .hint-touch { display: table !important; } }
+  .tip {
+    position: fixed; z-index: 35; left: 0; top: 0; pointer-events: none;
+    font: 700 18px 'Caveat', cursive; color: var(--ink); background: var(--paper);
+    padding: 4px 10px; border-radius: 6px; opacity: 0; transition: opacity .15s ease;
+    white-space: nowrap;
+  }
+  .tip.is-on { opacity: 1; }
+  .bubble {
+    position: fixed; z-index: 34; left: 0; top: 0; max-width: min(300px, 80vw);
+    background: var(--paper); color: var(--ink); border-radius: 14px; padding: 12px 16px;
+    font: 700 21px/1.2 'Caveat', cursive; box-shadow: 0 14px 40px -12px var(--stage-bg);
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .bubble::after {
+    content: ''; position: absolute; left: 50%; bottom: -9px; width: 18px; height: 18px;
+    background: var(--paper); transform: translateX(-50%) rotate(45deg); border-radius: 3px;
+  }
+  .bubble.is-on { opacity: 1; pointer-events: auto; }
+  .bubble a { display: inline-block; margin-top: 6px; color: var(--ink-red); text-decoration: none; }
+  .bubble a:hover { text-decoration: underline; }
+  .sound {
+    position: fixed; z-index: 36; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font: 700 17px 'Caveat', cursive; color: var(--stage-text);
+    background: var(--stage-island); border: 1px solid var(--stage-line); border-radius: 999px; padding: 7px 14px 7px 10px;
+  }
+  .sound svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sound svg path:first-child { fill: currentColor; }
+  .sound[aria-pressed="false"] svg path:last-child { opacity: .25; }
+  .vote-done a { color: var(--ink-red); text-decoration: none; margin-left: 6px; }
+  .loader {
+    position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: var(--stage-bg); transition: opacity .7s ease, visibility .7s;
+  }
+  .loader.is-done { opacity: 0; visibility: hidden; }
+  .loader-track { width: 180px; height: 3px; background: var(--stage-line); border-radius: 3px; overflow: hidden; }
+  .loader-bar { height: 100%; background: var(--stage-accent); transform-origin: left; transform: scaleX(0); transition: transform .3s ease; }
+  .no-3d .loader, .no-3d .sound, .no-3d .chip-cap, .no-3d .chapter-count { display: none; }
 
   /* Depois da cena: conteúdo normal, para quem quer ler e para o Google */
   .after { position: relative; z-index: 25; background: var(--stage-bg); padding: 80px 22px 40px; }
@@ -225,36 +284,44 @@
 
   <canvas id="scene" aria-label="Cena 3D: a mesa do Inteli com o diário de bordo da Be My Mentor"></canvas>
   <div id="progress" aria-hidden="true"></div>
+  <div class="loader" id="loader" aria-hidden="true">
+    <span class="paper">abrindo o diário<span class="cursor">_</span></span>
+    <div class="loader-track"><div class="loader-bar" id="loader-bar"></div></div>
+  </div>
 
   <main>
     <section id="stage" aria-label="O diário de bordo, página por página">
       <h1 class="sr-only">Be My Mentor: uma startup universitária construída ao vivo</h1>
     </section>
 
-    <div class="cap cap--top" data-from="0" data-to="0.075">
+    <div class="cap cap--top" data-cap="intro">
       <span class="paper">uma startup construída ao vivo<span class="cursor">_</span></span>
       <div class="scroll-hint">role para entrar ↓</div>
     </div>
-    <div class="cap" data-from="0.09" data-to="0.17">
+    <div class="cap" data-cap="table">
       <span class="paper">Cauan &amp; Bruno · alunos do Inteli e founders<span class="cursor">_</span></span>
+      <span class="paper hint-touch">toca neles, no celular, no café…</span>
     </div>
-    <div class="cap" data-from="0.175" data-to="0.235">
+    <div class="cap" data-cap="cover">
       <span class="paper">toda semana, um registro no diário<span class="cursor">_</span></span>
       <span class="paper">o que deu certo, o que deu errado</span>
     </div>
 
-    <div class="cap" data-from="0.645" data-to="0.74">
+    <a class="cap chip-cap" id="chapter-link" href="#"><span>ler o registro completo</span> →</a>
+    <div class="chapter-count" id="chapter-count" aria-hidden="true">1 / 8</div>
+
+    <div class="cap" data-cap="vote">
       <div class="paper slip">
         <span>e você, abriria agora?</span>
         <div class="stamps">
           <button class="stamp stamp--yes" type="button" data-vote="sim">✔ abriria</button>
           <button class="stamp stamp--no" type="button" data-vote="nao">✘ ainda não</button>
         </div>
-        <span class="vote-done">carimbado! olha a página ↑</span>
+        <span class="vote-done">carimbado! olha a página ↑ <a href="registro-7.html">ler o #007 →</a></span>
       </div>
     </div>
 
-    <div class="cap" data-from="0.8" data-to="0.865">
+    <div class="cap" data-cap="newsletter">
       <div class="paper slip">
         <span>o registro #008 no seu e-mail<span class="cursor">_</span></span>
         <form class="subscribe-form" novalidate>
@@ -267,12 +334,16 @@
       </div>
     </div>
 
-    <div class="cap" data-from="0.875" data-to="0.935">
+    <div class="cap" data-cap="pull1">
       <span class="paper">hoje é uma mesa no Inteli<span class="cursor">_</span></span>
     </div>
-    <div class="cap" data-from="0.945" data-to="1.01">
+    <div class="cap" data-cap="pull2">
       <span class="paper">amanhã, todo campus do país<span class="cursor">_</span></span>
     </div>
+
+    <div class="tip" id="tip" aria-hidden="true"></div>
+    <div class="bubble" id="bubble" role="status" aria-live="polite"><p></p><a hidden></a></div>
+    <button class="sound" id="sound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><span>som desligado</span></button>
 
     <section class="after" aria-label="Acompanhe">
       <div class="after-inner">
