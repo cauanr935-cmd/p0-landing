@@ -421,7 +421,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   furniture.add(lamp);
 
   // ── Luzes da sala ──
-  const key = new THREE.SpotLight('#ffdcae', 4.2, 8, Math.PI / 2.8, 0.85, 1.4);
+  const key = new THREE.SpotLight('#ffdcae', 3.4, 8, Math.PI / 2.8, 0.9, 1.4);
   key.position.set(0, 2.0, -0.05);
   key.target.position.set(0, 0.75, -0.05);
   key.castShadow = true;
@@ -577,13 +577,14 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     g.add(body);
     const [ac, ax] = paper.makeCanvas(400, 600);
     paper.drawPersonBack(ax, 400, 600, who, { arm: true });
-    const armH = H * 0.42, armW = armH * (400 / 600);
+    // o braço sai do ombro direito (de quem vê) e sobe até o quadro
+    const armH = H * 0.36, armW = armH * (400 / 600);
     const arm = new THREE.Group();
-    arm.position.set(H * 0.17, H * 0.75, 0.004);
+    arm.position.set(H * 0.165, H * 0.775, 0.004);
     const armMesh = new THREE.Mesh(new THREE.PlaneGeometry(armW, armH), new THREE.MeshStandardMaterial({ map: canvasTex(ac), alphaTest: 0.5, roughness: 0.9 }));
-    armMesh.position.set(armW * 0.15, armH * 0.48, 0);
+    armMesh.position.set(armW * (0.5 - 0.26), armH * (0.5 - 0.07), 0);
     arm.add(armMesh);
-    arm.rotation.z = -0.18;
+    arm.rotation.z = -0.1;
     g.add(arm);
     g.rotation.y = -Math.PI / 2;
     g.position.set(x1 - 0.42, 0, z);

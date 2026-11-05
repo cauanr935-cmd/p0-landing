@@ -533,100 +533,157 @@ export function drawWhiteboard(ctx, w, h) {
 // em tamanho real. Desenha o corpo (sem o braço que escreve) ou só o braço.
 export function drawPersonBack(ctx, w, h, who, { arm = false } = {}) {
   const look = who === 'bruno'
-    ? { hood: '#1f2a44', hoodDark: '#151d31', pants: '#2c3446', hair: '#16110e', curly: true }
-    : { hood: '#141416', hoodDark: '#0a0a0b', pants: '#c8b48e', hair: '#1c140f', curly: false };
+    ? { hood: '#263453', light: '#3a4b72', dark: '#161f35', pants: '#2b3242', hair: '#17110d', curly: true }
+    : { hood: '#1d1d21', light: '#34343b', dark: '#0d0d10', pants: '#c6b28c', hair: '#1e1611', curly: false };
+  const skin = '#b6865f';
   const [c, x] = makeCanvas(w, h);
-  const cx = w / 2;
-  const u = h / 100; // 1 unidade = 1% da altura
   x.lineJoin = 'round';
   x.lineCap = 'round';
+  const cloth = (x0, x1) => {
+    const g = x.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, look.dark);
+    g.addColorStop(0.45, look.hood);
+    g.addColorStop(0.8, look.light);
+    g.addColorStop(1, look.hood);
+    return g;
+  };
   if (!arm) {
+    const cx = w / 2;
+    const u = h / 100;
     // pernas
+    const pg = x.createLinearGradient(cx - 14 * u, 0, cx + 14 * u, 0);
+    pg.addColorStop(0, look.pants);
+    pg.addColorStop(1, '#00000033');
     x.fillStyle = look.pants;
     x.beginPath();
-    x.moveTo(cx - 13 * u, 52 * u);
-    x.lineTo(cx - 12 * u, 97 * u);
-    x.lineTo(cx - 2 * u, 97 * u);
-    x.lineTo(cx, 60 * u);
-    x.lineTo(cx + 2 * u, 97 * u);
-    x.lineTo(cx + 12 * u, 97 * u);
-    x.lineTo(cx + 13 * u, 52 * u);
+    x.moveTo(cx - 13 * u, 54 * u);
+    x.quadraticCurveTo(cx - 13.5 * u, 76 * u, cx - 11.5 * u, 96 * u);
+    x.lineTo(cx - 2.5 * u, 96 * u);
+    x.lineTo(cx - 0.8 * u, 62 * u);
+    x.lineTo(cx + 0.8 * u, 62 * u);
+    x.lineTo(cx + 2.5 * u, 96 * u);
+    x.lineTo(cx + 11.5 * u, 96 * u);
+    x.quadraticCurveTo(cx + 13.5 * u, 76 * u, cx + 13 * u, 54 * u);
     x.closePath();
     x.fill();
-    x.fillStyle = '#e9e6df';
-    x.fillRect(cx - 13 * u, 96 * u, 12 * u, 3 * u);
-    x.fillRect(cx + 1 * u, 96 * u, 12 * u, 3 * u);
-    // moletom
-    x.fillStyle = look.hood;
+    x.strokeStyle = 'rgba(0,0,0,0.25)';
+    x.lineWidth = 0.5 * u;
+    x.beginPath(); x.moveTo(cx, 62 * u); x.lineTo(cx, 56 * u); x.stroke();
+    // tênis
+    x.fillStyle = '#ecebe6';
+    x.beginPath(); x.roundRect(cx - 12.5 * u, 95 * u, 10.5 * u, 4 * u, 1.5 * u); x.fill();
+    x.beginPath(); x.roundRect(cx + 2 * u, 95 * u, 10.5 * u, 4 * u, 1.5 * u); x.fill();
+    // braço que fica para baixo (esquerda de quem vê)
+    x.fillStyle = cloth(cx - 26 * u, cx - 15 * u);
     x.beginPath();
-    x.moveTo(cx - 9 * u, 16 * u);
-    x.quadraticCurveTo(cx - 21 * u, 17 * u, cx - 21 * u, 26 * u);
-    x.lineTo(cx - 17 * u, 56 * u);
-    x.lineTo(cx + 17 * u, 56 * u);
-    x.lineTo(cx + 21 * u, 26 * u);
-    x.quadraticCurveTo(cx + 21 * u, 17 * u, cx + 9 * u, 16 * u);
+    x.moveTo(cx - 19 * u, 22 * u);
+    x.quadraticCurveTo(cx - 24 * u, 26 * u, cx - 24.5 * u, 36 * u);
+    x.lineTo(cx - 24 * u, 50 * u);
+    x.lineTo(cx - 18.5 * u, 50 * u);
+    x.lineTo(cx - 17 * u, 34 * u);
     x.closePath();
     x.fill();
-    // braço que fica para baixo (lado esquerdo de quem vê)
+    x.fillStyle = skin;
+    x.beginPath(); x.ellipse(cx - 21.3 * u, 52 * u, 2.6 * u, 3.2 * u, 0.1, 0, Math.PI * 2); x.fill();
+    // tronco do moletom
+    x.fillStyle = cloth(cx - 20 * u, cx + 20 * u);
     x.beginPath();
-    x.moveTo(cx - 20 * u, 24 * u);
-    x.lineTo(cx - 25 * u, 48 * u);
-    x.lineTo(cx - 19 * u, 49 * u);
-    x.lineTo(cx - 15 * u, 30 * u);
+    x.moveTo(cx - 8 * u, 15.5 * u);
+    x.quadraticCurveTo(cx - 19 * u, 16.5 * u, cx - 19.5 * u, 24 * u);
+    x.quadraticCurveTo(cx - 18 * u, 40 * u, cx - 16 * u, 55 * u);
+    x.quadraticCurveTo(cx, 57 * u, cx + 16 * u, 55 * u);
+    x.quadraticCurveTo(cx + 18 * u, 40 * u, cx + 19.5 * u, 24 * u);
+    x.quadraticCurveTo(cx + 19 * u, 16.5 * u, cx + 8 * u, 15.5 * u);
     x.closePath();
     x.fill();
-    x.fillStyle = '#b98a68';
-    x.beginPath(); x.ellipse(cx - 22.5 * u, 50.5 * u, 2.6 * u, 3 * u, 0, 0, Math.PI * 2); x.fill();
-    // capuz caído nas costas e costuras
-    x.fillStyle = look.hoodDark;
+    // barra, costuras e dobras
+    x.fillStyle = look.dark;
+    x.beginPath(); x.roundRect(cx - 16 * u, 51.5 * u, 32 * u, 4 * u, 1 * u); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,0.06)';
+    x.lineWidth = 0.7 * u;
+    [[-9, 30, -6, 46], [5, 28, 8, 44], [-2, 34, -1, 48]].forEach(([a, b, c2, d]) => {
+      x.beginPath(); x.moveTo(cx + a * u, b * u); x.quadraticCurveTo(cx + (a + c2) / 2 * u - u, (b + d) / 2 * u, cx + c2 * u, d * u); x.stroke();
+    });
+    // capuz caído
+    x.fillStyle = look.dark;
     x.beginPath();
     x.moveTo(cx - 10 * u, 15 * u);
-    x.quadraticCurveTo(cx, 30 * u, cx + 10 * u, 15 * u);
-    x.quadraticCurveTo(cx, 20 * u, cx - 10 * u, 15 * u);
+    x.quadraticCurveTo(cx - 11 * u, 27 * u, cx, 29 * u);
+    x.quadraticCurveTo(cx + 11 * u, 27 * u, cx + 10 * u, 15 * u);
+    x.quadraticCurveTo(cx, 19 * u, cx - 10 * u, 15 * u);
     x.fill();
-    x.strokeStyle = look.hoodDark;
-    x.lineWidth = 0.6 * u;
-    x.beginPath(); x.moveTo(cx - 16 * u, 52 * u); x.lineTo(cx + 16 * u, 52 * u); x.stroke();
-    // pescoço e cabeça (de costas: só cabelo e orelhas)
-    x.fillStyle = '#b98a68';
-    x.fillRect(cx - 4 * u, 11 * u, 8 * u, 6 * u);
-    x.beginPath(); x.ellipse(cx - 7.4 * u, 8 * u, 1.6 * u, 2.4 * u, 0, 0, Math.PI * 2); x.fill();
-    x.beginPath(); x.ellipse(cx + 7.4 * u, 8 * u, 1.6 * u, 2.4 * u, 0, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = look.light;
+    x.lineWidth = 0.5 * u;
+    x.beginPath(); x.moveTo(cx - 8.5 * u, 17 * u); x.quadraticCurveTo(cx, 26 * u, cx + 8.5 * u, 17 * u); x.stroke();
+    // pescoço, orelhas e cabelo
+    x.fillStyle = skin;
+    x.fillRect(cx - 3.8 * u, 11 * u, 7.6 * u, 5.5 * u);
+    x.beginPath(); x.ellipse(cx - 7.3 * u, 8.2 * u, 1.5 * u, 2.3 * u, 0, 0, Math.PI * 2); x.fill();
+    x.beginPath(); x.ellipse(cx + 7.3 * u, 8.2 * u, 1.5 * u, 2.3 * u, 0, 0, Math.PI * 2); x.fill();
     x.fillStyle = look.hair;
-    x.beginPath(); x.ellipse(cx, 6.5 * u, 7.4 * u, 6.6 * u, 0, 0, Math.PI * 2); x.fill();
+    x.beginPath();
+    x.moveTo(cx - 7.2 * u, 10.5 * u);
+    x.quadraticCurveTo(cx - 8.4 * u, 0.5 * u, cx, 0.4 * u);
+    x.quadraticCurveTo(cx + 8.4 * u, 0.5 * u, cx + 7.2 * u, 10.5 * u);
+    x.quadraticCurveTo(cx, 13 * u, cx - 7.2 * u, 10.5 * u);
+    x.fill();
+    const rand = seeded(who === 'bruno' ? 44 : 45);
     if (look.curly) {
-      const rand = seeded(44);
-      for (let i = 0; i < 46; i++) {
-        const a = rand() * Math.PI * 2, r = rand() * 6.5 * u;
-        x.beginPath(); x.arc(cx + Math.cos(a) * r, 5 * u + Math.sin(a) * r * 0.85 - 1.5 * u, 1.5 * u, 0, Math.PI * 2); x.fill();
+      for (let i = 0; i < 60; i++) {
+        const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * 6.6 * u;
+        x.beginPath(); x.arc(cx + Math.cos(a) * r, 4.6 * u + Math.sin(a) * r * 0.75, (1.1 + rand() * 0.7) * u, 0, Math.PI * 2); x.fill();
       }
     }
+    x.strokeStyle = 'rgba(255,255,255,0.12)';
+    x.lineWidth = 0.4 * u;
+    for (let i = 0; i < 9; i++) {
+      x.beginPath();
+      const sx = cx + (rand() - 0.5) * 9 * u;
+      x.moveTo(sx, 2 * u + rand() * 3 * u);
+      x.quadraticCurveTo(sx + 1.5 * u, 6 * u, sx + (rand() - 0.5) * 2 * u, 10 * u);
+      x.stroke();
+    }
   } else {
-    // braço levantado escrevendo: sai do ombro (canto inferior esquerdo) para cima
-    x.fillStyle = look.hood;
-    x.beginPath();
-    x.moveTo(w * 0.18, h * 0.98);
-    x.lineTo(w * 0.62, h * 0.2);
-    x.lineTo(w * 0.86, h * 0.26);
-    x.lineTo(w * 0.52, h * 0.98);
-    x.closePath();
-    x.fill();
-    x.fillStyle = '#b98a68';
-    x.beginPath(); x.ellipse(w * 0.76, h * 0.17, w * 0.13, h * 0.08, -0.5, 0, Math.PI * 2); x.fill();
+    // braço levantado: ombro embaixo à esquerda, cotovelo à direita, mão no alto
+    const sh = [w * 0.26, h * 0.93], el = [w * 0.8, h * 0.62], hd = [w * 0.52, h * 0.2];
+    const sleeve = (a, b, r0, r1) => {
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI / 2;
+      x.beginPath();
+      x.moveTo(a[0] + Math.cos(ang) * r0, a[1] + Math.sin(ang) * r0);
+      x.lineTo(b[0] + Math.cos(ang) * r1, b[1] + Math.sin(ang) * r1);
+      x.lineTo(b[0] - Math.cos(ang) * r1, b[1] - Math.sin(ang) * r1);
+      x.lineTo(a[0] - Math.cos(ang) * r0, a[1] - Math.sin(ang) * r0);
+      x.closePath();
+      x.fill();
+      x.beginPath(); x.arc(b[0], b[1], r1, 0, Math.PI * 2); x.fill();
+    };
+    x.fillStyle = cloth(w * 0.2, w * 0.9);
+    sleeve(sh, el, w * 0.17, w * 0.12);
+    sleeve(el, [hd[0], hd[1] + h * 0.08], w * 0.12, w * 0.1);
+    // punho
+    x.fillStyle = look.dark;
+    x.beginPath(); x.ellipse(hd[0], hd[1] + h * 0.075, w * 0.1, h * 0.025, -0.15, 0, Math.PI * 2); x.fill();
+    // mão com o marcador
+    x.fillStyle = skin;
+    x.beginPath(); x.ellipse(hd[0] + w * 0.01, hd[1] + h * 0.02, w * 0.085, h * 0.055, -0.2, 0, Math.PI * 2); x.fill();
     x.fillStyle = '#1f3a8a';
     x.save();
-    x.translate(w * 0.82, h * 0.08);
-    x.rotate(0.5);
-    x.fillRect(-w * 0.04, -h * 0.06, w * 0.08, h * 0.12);
+    x.translate(hd[0] + w * 0.06, hd[1] - h * 0.04);
+    x.rotate(0.35);
+    x.beginPath(); x.roundRect(-w * 0.025, -h * 0.05, w * 0.05, h * 0.09, w * 0.01); x.fill();
     x.restore();
+    // dobras no cotovelo
+    x.strokeStyle = 'rgba(255,255,255,0.08)';
+    x.lineWidth = w * 0.012;
+    x.beginPath(); x.moveTo(el[0] - w * 0.08, el[1] + h * 0.03); x.lineTo(el[0] + w * 0.02, el[1] - h * 0.02); x.stroke();
   }
   // borda branca de figurinha
-  const border = Math.round(h * 0.008);
+  const border = Math.round(Math.max(w, h) * 0.007);
   ctx.clearRect(0, 0, w, h);
   const [m, mx] = makeCanvas(w, h);
-  for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) mx.drawImage(c, Math.cos(a) * border, Math.sin(a) * border);
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 12) mx.drawImage(c, Math.cos(a) * border, Math.sin(a) * border);
   mx.globalCompositeOperation = 'source-in';
-  mx.fillStyle = '#ffffff';
+  mx.fillStyle = '#f6f3ec';
   mx.fillRect(0, 0, w, h);
   ctx.drawImage(m, 0, 0);
   ctx.drawImage(c, 0, 0);

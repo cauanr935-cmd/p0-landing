@@ -599,8 +599,8 @@ function start() {
     const L = bookShot(-1), R = bookShot(1), C = bookShot(0);
     const list = [
       [0, far({ pos: V(3.4, 1.65, 6.0), look: V(0.85, 1.3, 0.6) }, 1.3)],
-      [TL.intro.wide[1], far({ pos: V(1.55, 1.5, 2.75), look: V(1.2, 1.1, 0) }, 1.3)],
-      [(TL.intro.wide[1] + TL.intro.table[1]) / 2, { pos: V(1.15, 1.42, 1.2), look: V(2.05, 1.3, -0.35) }],
+      [TL.intro.wide[1], far({ pos: V(1.62, 1.5, 2.75), look: V(1.2, 1.1, 0) }, 1.3)],
+      [(TL.intro.wide[1] + TL.intro.table[1]) / 2, { pos: V(1.0, 1.5, 1.45), look: V(2.1, 1.2, -0.45) }],
       [TL.intro.table[1], far({ pos: V(0.55, 1.18, 0.95), look: V(0, onTable + 0.08, -0.1) }, 1.45)],
       [TL.cover[1], C],
     ];
@@ -910,7 +910,7 @@ function start() {
     // Cauan e Bruno escrevendo no quadro
     R.writers.forEach((w) => {
       const a = w.userData.arm;
-      a.rotation.z = -0.18 + Math.sin(time * 3.1 + w.userData.phase) * 0.07 + Math.sin(time * 7.3 + w.userData.phase) * 0.02;
+      a.rotation.z = -0.1 + Math.sin(time * 3.1 + w.userData.phase) * 0.07 + Math.sin(time * 7.3 + w.userData.phase) * 0.02;
     });
 
     // celular vibra de tempos em tempos enquanto estamos na sala
