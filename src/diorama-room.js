@@ -9,10 +9,13 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import * as paper from './diorama-paper.js';
 
 // Medidas (metros). Frente de vidro em +z, TV ao fundo em -z.
+// A sala é desenhada centrada em x = 0 e depois deslocada em `cx`, para a mesa
+// (que fica na origem da cena) encostar na parede lateral esquerda.
 export const POD = {
   x0: -1.5, x1: 1.5, zBack: -1.9, zFront: 1.7, eave: 2.2, ridge: 2.9, t: 0.09,
+  cx: 0.705,
   door: { x0: 0.3, x1: 1.33, h: 2.08 },
-  roomNumber: '06',
+  roomNumber: '07',
 };
 
 export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, makeVideo, renderer }) {
@@ -59,14 +62,31 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const shell = std('#2a2a30', { roughness: 0.9 });
 
   const pod = new THREE.Group();
+  pod.position.x = POD.cx;
   room.add(pod);
+  // casca da sala (paredes, telhado, frente): ao passar o mouse, o nome da sala
+  const shellGroup = new THREE.Group();
+  pod.add(shellGroup);
+  // mobília fica nas coordenadas da cena (mesa na origem)
+  const furniture = new THREE.Group();
+  room.add(furniture);
 
   // ── Prédio em volta: concreto, tijolo aparente, reboco branco ──
   const outside = new THREE.Group();
   room.add(outside);
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(9, 11), std('#ffffff', { map: tiled(concrete, 4, 5), roughness: 0.95 }));
   ground.rotation.x = -Math.PI / 2;
-  ground.position.set(0.4, 0, 0.6);
+  ground.position.set(0.4 + POD.cx, 0, 0.6);
+  // bordas do chão se apagam no escuro, para o afastamento virar um ponto sem quinas
+  const [fadeC, fadeX] = paper.makeCanvas(256, 256);
+  const fadeG = fadeX.createRadialGradient(128, 128, 40, 128, 128, 128);
+  fadeG.addColorStop(0, '#ffffff');
+  fadeG.addColorStop(1, '#000000');
+  fadeX.fillStyle = fadeG;
+  fadeX.fillRect(0, 0, 256, 256);
+  ground.material.alphaMap = canvasTex(fadeC, { linear: true });
+  ground.material.transparent = true;
+  ground.material.depthWrite = false;
   ground.receiveShadow = true;
   outside.add(ground);
   const brickMat = (w, h) => std('#ffffff', { map: tiled(brick, w / 1.6, h / 1.6), roughness: 1 });
@@ -89,7 +109,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   }
   // duto verde-água no alto
   const duct = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.32, 9), std('#5fb3ad', { roughness: 0.6, metalness: 0.3 }));
-  duct.position.set(2.2, 3.9, 0.4);
+  duct.position.set(2.2 + POD.cx, 3.9, 0.4);
   outside.add(duct);
 
   // ── Piso da sala ──
@@ -113,7 +133,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     wall.position.set(side * (W / 2 + T / 2), EV / 2, ZC - T / 2);
     wall.receiveShadow = true;
     wall.castShadow = true;
-    pod.add(wall);
+    shellGroup.add(wall);
   });
 
   // ── Parede do fundo (empena) ──
@@ -133,11 +153,11 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const backOut = new THREE.Mesh(uvMeters(new THREE.ShapeGeometry(gable(T)), PLY, PLY), plyShape);
   backOut.rotation.y = Math.PI;
   backOut.position.z = ZB - T;
-  pod.add(backIn, backOut);
+  shellGroup.add(backIn, backOut);
 
   // ── Teto inclinado (por dentro) e telhado de pinus (por fora) ──
   const roof = new THREE.Group();
-  pod.add(roof);
+  shellGroup.add(roof);
   const Ls = Math.hypot(W / 2, RG - EV);
   const ceilingMat = std('#7c7360', { roughness: 1 });
   const leds = [];
@@ -151,7 +171,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     out.position.y = T + 0.0175;
     out.castShadow = false;
     // fita de LED correndo da frente ao fundo
-    const led = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.012, D * 0.78), new THREE.MeshBasicMaterial({ color: '#fffaf0' }));
+    const led = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.012, D * 0.78), std('#d9d6cf', { roughness: 0.4 })); // apagada
     led.position.set(-side * 0.12, -0.008, -0.05);
     g.add(ceil, out, led);
     leds.push(led);
@@ -164,7 +184,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   // ── Frente: moldura de pinus, vidro, caixilho branco e porta ──
   const front = new THREE.Group();
   front.position.z = ZF;
-  pod.add(front);
+  shellGroup.add(front);
   const inX = x1 - 0.08, inEave = EV - 0.03, inRidge = RG - 0.07;
   const topAt = (x) => inRidge - Math.abs(x) * ((inRidge - inEave) / inX);
   const outerEave = EV + T / Math.cos(theta) - T * slope;
@@ -287,7 +307,6 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   lock.rotation.x = Math.PI / 2;
   lock.position.set(-DW / 2 + 0.06, 0.98, 0);
   leaf.add(lock);
-  clickable(door, `sala R${POD.roomNumber}`, () => bubbleAt(door, `Sala R${POD.roomNumber}, Inteli. É aqui que a Be My Mentor acontece.`));
 
   // ── Do lado de fora: piso tátil, número no chão, extintor, arandela ──
   const [tcC, tcX] = paper.makeCanvas(256, 256);
@@ -298,13 +317,13 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const tactile = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.4), std('#ffffff', { map: tactTex, roughness: 0.8 }));
   tactile.rotation.x = -Math.PI / 2;
   tactile.position.set((dx0 + dx1) / 2, 0.003, ZF + 0.45);
-  outside.add(tactile);
+  pod.add(tactile);
   const [fmC, fmX] = paper.makeCanvas(1024, 400);
   paper.drawDoorSign(fmX, 1024, 400, 'R' + POD.roomNumber);
   const floorMark = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.47), new THREE.MeshBasicMaterial({ map: canvasTex(fmC), transparent: true, opacity: 0.55, depthWrite: false }));
   floorMark.rotation.x = -Math.PI / 2;
   floorMark.position.set((dx0 + dx1) / 2 - 0.1, 0.004, ZF + 1.05);
-  outside.add(floorMark);
+  pod.add(floorMark);
 
   const ext = new THREE.Group();
   const red = std('#c8231c', { roughness: 0.35, metalness: 0.2 });
@@ -319,7 +338,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   ext.add(body, dome, valve, stand);
   ext.position.set(x1 + T + 0.16, 0, ZF - 0.35);
   ext.scale.setScalar(0.85);
-  outside.add(ext);
+  pod.add(ext);
   clickable(ext, 'extintor', () => bubbleAt(ext, 'Pra quando o deploy pega fogo.'));
 
   const sconce = new THREE.Group();
@@ -347,7 +366,8 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 0.63), screenMat);
   screen.position.z = 0.0235;
   tv.add(screen);
-  tv.position.set(-0.15, 1.5, ZB + 0.04);
+  tv.rotation.y = Math.PI / 2;
+  tv.position.set(x0 + 0.04, 1.55, 0);
   pod.add(tv);
   let showingVision = false;
   clickable(tv, 'a TV da sala', () => {
@@ -376,13 +396,13 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const boardFace = std('#ffffff', { map: canvasTex(wbC), roughness: 0.22, metalness: 0.05 });
   const boardEdge = std('#e3e5e8', { roughness: 0.4 });
   const whiteboard = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.95, 1.12, 0.025, 5, 0.012), [boardEdge, boardEdge, boardEdge, boardEdge, boardFace, boardEdge]));
-  whiteboard.rotation.y = Math.PI / 2;
-  whiteboard.position.set(x0 + 0.016, 1.52, -0.45);
+  whiteboard.rotation.y = -Math.PI / 2;
+  whiteboard.position.set(x1 - 0.016, 1.52, -0.35);
   pod.add(whiteboard);
   const boardFoot = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.018, 1.9), std('#111'));
-  boardFoot.position.set(x0 + 0.03, 0.965, -0.45);
+  boardFoot.position.set(x1 - 0.03, 0.965, -0.35);
   pod.add(boardFoot);
-  clickable(whiteboard, 'o quadro da sprint', () => bubbleAt(whiteboard, 'Tudo que tá no quadro saiu de um registro. O circuito é da aula de antes.'));
+  clickable(whiteboard, 'o quadro da sprint', () => bubbleAt(whiteboard, 'Next steps: horas complementares, MIT e as 10 mentorias.'));
 
   // pendente verde-sálvia com luz quente
   const lamp = new THREE.Group();
@@ -393,14 +413,15 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const bulb = new THREE.Mesh(new THREE.CircleGeometry(0.22, 32), new THREE.MeshBasicMaterial({ color: '#fff3dc' }));
   bulb.rotation.x = Math.PI / 2;
   bulb.position.y = -0.09;
-  const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, RG - 2.2, 6), std('#222'));
-  cord.position.y = 0.11 + (RG - 2.2) / 2;
+  const ceilAt = RG - POD.cx * slope; // teto inclinado acima da mesa
+  const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, ceilAt - 2.2, 6), std('#222'));
+  cord.position.y = 0.11 + (ceilAt - 2.2) / 2;
   lamp.add(shade, cap, bulb, cord);
   lamp.position.set(0, 2.2 - 0.11, -0.05);
-  pod.add(lamp);
+  furniture.add(lamp);
 
   // ── Luzes da sala ──
-  const key = new THREE.SpotLight('#ffe7c8', 7, 8, Math.PI / 3, 0.75, 1.4);
+  const key = new THREE.SpotLight('#ffdcae', 4.2, 8, Math.PI / 2.8, 0.85, 1.4);
   key.position.set(0, 2.0, -0.05);
   key.target.position.set(0, 0.75, -0.05);
   key.castShadow = true;
@@ -408,28 +429,29 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   key.shadow.bias = -0.0003;
   key.shadow.normalBias = 0.02;
   key.shadow.camera.near = 0.2;
-  pod.add(key, key.target);
-  const ceilingGlow = new THREE.PointLight('#fff4e4', 2.2, 6, 1.6);
-  ceilingGlow.position.set(0, 2.45, 0.2);
-  pod.add(ceilingGlow);
+  furniture.add(key, key.target);
+  // o resto da sala só recebe o que vaza da luminária
+  const spill = new THREE.PointLight('#ffcf9a', 1.1, 4.5, 1.8);
+  spill.position.set(0, 1.95, -0.05);
+  furniture.add(spill);
   const tvGlow = new THREE.PointLight('#8f7bff', 0.5, 2.4, 2);
-  tvGlow.position.set(-0.15, 1.5, ZB + 0.5);
+  tvGlow.position.set(x0 + 0.5, 1.55, 0);
   pod.add(tvGlow);
 
   // ── Mesa de carvalho e cadeiras ──
   const topMat = std('#ffffff', { map: tiled(oak, 1, 1), roughness: 0.5 });
   const tableTop = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.6, 0.035, 1.15, 3, 0.008), topMat));
   tableTop.position.y = 0.7525;
-  pod.add(tableTop);
+  furniture.add(tableTop);
   const dark = std('#26262a', { roughness: 0.5, metalness: 0.4 });
   [[-0.72, -0.48], [0.72, -0.48], [-0.72, 0.48], [0.72, 0.48]].forEach(([x, z]) => {
     const leg = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.735, 0.05), dark));
     leg.position.set(x, 0.3675, z);
-    pod.add(leg);
+    furniture.add(leg);
   });
   const modesty = shadowy(new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.3, 0.02), dark));
   modesty.position.set(0, 0.58, -0.3);
-  pod.add(modesty);
+  furniture.add(modesty);
 
   const [pfC, pfX] = paper.makeCanvas(256, 256);
   paper.drawPerforated(pfX, 256, 256);
@@ -470,13 +492,14 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     });
     g.position.set(x, 0, z);
     g.rotation.y = ry;
-    pod.add(g);
+    furniture.add(g);
   }
-  officeChair(-0.42, 0.95, Math.PI + 0.05);
-  officeChair(0.45, 0.98, Math.PI - 0.12);
-  officeChair(-0.4, -0.95, 0.08);
+  officeChair(-0.36, 0.95, Math.PI + 0.05);
+  officeChair(0.42, 0.98, Math.PI - 0.12);
+  officeChair(-0.34, -0.95, 0.08);
   officeChair(0.42, -0.92, -0.06);
-  officeChair(1.12, 0.05, -Math.PI / 2 + 0.1);
+  // a cadeira que ficou para trás, virada para o quadro
+  officeChair(1.15, 0.6, -Math.PI / 2 - 0.4);
 
   // cadeira de visita (tecido cinza, estrutura preta) encostada sob o quadro
   const [fbC, fbX] = paper.makeCanvas(256, 256);
@@ -504,9 +527,9 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     g.add(rail);
     g.position.set(x, 0, z);
     g.rotation.y = ry;
-    pod.add(g);
+    furniture.add(g);
   }
-  sideChair(x0 + 0.28, 0.75, Math.PI / 2);
+  sideChair(1.75, ZB + 0.3, 0);
 
   // material de mesa: bandeja de papel, porta-lápis de tela, grampeador azul
   const onTable = 0.77;
@@ -523,26 +546,62 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   });
   tray.position.set(-0.08, onTable + 0.003, -0.42);
   tray.rotation.y = Math.PI / 2 + 0.06;
-  pod.add(tray);
+  furniture.add(tray);
   const cup = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.032, 0.09, 20, 1, true), std('#8fb6d6', { roughness: 0.5, metalness: 0.4, transparent: true, opacity: 0.85, side: THREE.DoubleSide })));
   cup.position.set(-0.66, onTable + 0.045, -0.42);
-  pod.add(cup);
+  furniture.add(cup);
   ['#1f3a8a', '#d2372b', '#1f8a4c', '#111'].forEach((c, i) => {
     const pen = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.15, 8), std(c, { roughness: 0.4 }));
     pen.position.set(-0.66 + Math.cos(i * 1.7) * 0.012, onTable + 0.1, -0.42 + Math.sin(i * 1.7) * 0.012);
     pen.rotation.set(Math.sin(i) * 0.15, 0, Math.cos(i * 2) * 0.15);
-    pod.add(pen);
+    furniture.add(pen);
   });
   const stapler = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.04, 0.045, 3, 0.015), std('#2f6fd6', { roughness: 0.35 })));
   stapler.position.set(0.12, onTable + 0.02, -0.47);
   stapler.rotation.y = 0.1;
-  pod.add(stapler);
+  furniture.add(stapler);
   const cableCover = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.004, 0.06), std('#7a1f24', { roughness: 0.6 }));
   cableCover.position.set(0.45, onTable + 0.002, -0.5);
-  pod.add(cableCover);
+  furniture.add(cableCover);
+
+  // ── Cauan e Bruno escrevendo no quadro (figurinhas de papel em tamanho real) ──
+  const writers = [];
+  [['cauan', 1.74, -0.78, 0.0], ['bruno', 1.7, 0.02, 1.7]].forEach(([who, H, z, phase]) => {
+    const g = new THREE.Group();
+    const [bc, bx] = paper.makeCanvas(600, 1500);
+    paper.drawPersonBack(bx, 600, 1500, who);
+    const bodyTex = canvasTex(bc);
+    const bodyGeo = new THREE.PlaneGeometry(H * 0.4, H);
+    bodyGeo.translate(0, H / 2, 0);
+    const body = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ map: bodyTex, alphaTest: 0.5, roughness: 0.9 }));
+    g.add(body);
+    const [ac, ax] = paper.makeCanvas(400, 600);
+    paper.drawPersonBack(ax, 400, 600, who, { arm: true });
+    const armH = H * 0.42, armW = armH * (400 / 600);
+    const arm = new THREE.Group();
+    arm.position.set(H * 0.17, H * 0.75, 0.004);
+    const armMesh = new THREE.Mesh(new THREE.PlaneGeometry(armW, armH), new THREE.MeshStandardMaterial({ map: canvasTex(ac), alphaTest: 0.5, roughness: 0.9 }));
+    armMesh.position.set(armW * 0.15, armH * 0.48, 0);
+    arm.add(armMesh);
+    arm.rotation.z = -0.18;
+    g.add(arm);
+    g.rotation.y = -Math.PI / 2;
+    g.position.set(x1 - 0.42, 0, z);
+    g.userData = { arm, phase };
+    pod.add(g);
+    writers.push(g);
+  });
+  const writersGroup = new THREE.Group();
+  pod.add(writersGroup);
+  writers.forEach((w) => writersGroup.add(w));
+  clickable(writersGroup, 'Cauan e Bruno na lousa', () => bubbleAt(writersGroup, 'Planejando os next steps. Ninguém apaga o quadro antes de tirar foto.'));
+
+  clickable(shellGroup, 'Sala R07 · escritório da Be My Mentor (às vezes)', () => bubbleAt(shellGroup, 'Sala R07 do Inteli: o escritório da Be My Mentor, às vezes.'));
 
   return {
     onTable,
+    duct,
+    writers,
     key,
     lamp,
     roof,

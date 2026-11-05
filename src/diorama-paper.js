@@ -486,39 +486,150 @@ export function drawWhiteboard(ctx, w, h) {
     ctx.fillStyle = `rgba(40,60,120,${0.02 + rand() * 0.03})`;
     ctx.fillRect(rand() * w, rand() * h, 120 + rand() * 360, 20 + rand() * 50);
   }
-  ctx.font = '96px "Caveat Brush"';
+  // coluna da esquerda: a sprint
+  ctx.font = '88px "Caveat Brush"';
   ctx.fillStyle = '#1f3a8a';
-  ctx.fillText('SPRINT · build in public', 70, 140);
-  ctx.font = '600 66px "Caveat"';
+  ctx.fillText('SPRINT · build in public', 60, 130);
+  ctx.font = '600 60px "Caveat"';
   ctx.fillStyle = '#222';
-  ctx.fillText('☐ fechar as 10 mentorias', 90, 260);
-  ctx.fillText('☑ registro #007 no ar', 90, 340);
-  ctx.fillText('☑ transcritor (WhisperX)', 90, 420);
+  ctx.fillText('☐ fechar as 10 mentorias', 80, 250);
+  ctx.fillText('☑ registro #007 no ar', 80, 330);
+  ctx.fillText('☑ transcritor (WhisperX)', 80, 410);
   ctx.fillStyle = RED;
-  ctx.fillText('abrir pra todo mundo? → ainda não', 90, 500);
-  // resto de aula de circuitos que ninguém apagou
-  ctx.strokeStyle = 'rgba(31,58,138,0.55)';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  const zig = (x, y) => { ctx.lineTo(x, y); for (let i = 0; i < 6; i++) ctx.lineTo(x + 8 + i * 8, y + (i % 2 ? 10 : -10)); ctx.lineTo(x + 56, y); };
-  ctx.moveTo(1010, 640); zig(1040, 640); ctx.lineTo(1160, 640); ctx.lineTo(1160, 600); zig(1170, 600); ctx.lineTo(1290, 600);
-  ctx.moveTo(1160, 640); ctx.lineTo(1160, 690); zig(1170, 690); ctx.lineTo(1290, 690); ctx.lineTo(1290, 600);
-  ctx.stroke();
-  ctx.font = '600 38px "Caveat"';
-  ctx.fillStyle = 'rgba(31,58,138,0.6)';
-  ctx.fillText('12V', 960, 650);
-  ctx.fillText('2kΩ', 1050, 690);
-  ctx.fillText('C = 400 nF', 1180, 770);
+  ctx.fillText('abrir pra todo mundo?', 80, 510);
+  ctx.fillText('→ ainda não', 120, 580);
   ctx.fillStyle = '#1f3a8a';
-  ctx.font = '82px "Caveat Brush"';
-  ctx.save();
-  ctx.translate(w - 380, 300);
-  ctx.rotate(-0.08);
-  ctx.fillText('77%', 0, 0);
-  ctx.font = '600 44px "Caveat"';
-  ctx.fillText('querem falar', 0, 50);
-  ctx.fillText('e não conseguem', 0, 96);
-  ctx.restore();
+  ctx.font = '600 56px "Caveat"';
+  ctx.fillText('10:00 – 17:30  MIT', 80, 720);
+  // divisória à mão
+  ctx.strokeStyle = '#1f3a8a';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.53, 60);
+  for (let y = 60; y <= h - 60; y += 40) ctx.lineTo(w * 0.53 + (rand() - 0.5) * 6, y);
+  ctx.stroke();
+  // coluna da direita: next steps
+  ctx.font = '92px "Caveat Brush"';
+  ctx.fillStyle = '#111';
+  ctx.fillText('NEXT STEPS', w * 0.57, 130);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#111';
+  ctx.beginPath(); ctx.moveTo(w * 0.57, 150); ctx.lineTo(w * 0.57 + 470, 156); ctx.stroke();
+  ctx.font = '600 58px "Caveat"';
+  [
+    ['• reunião', 'horas complementares'],
+    ['• reunião MIT', '10 mentorias antes de lançar'],
+    ['• analisador de áudio', 'vozes sobrepostas'],
+  ].forEach(([a, b], i) => {
+    const y = 270 + i * 190;
+    ctx.fillStyle = '#111';
+    ctx.fillText(a, w * 0.58, y);
+    ctx.fillStyle = '#1f3a8a';
+    ctx.fillText(b, w * 0.61, y + 66);
+  });
+}
+
+// Cauan e Bruno de costas, escrevendo no quadro, como figurinhas de papel
+// em tamanho real. Desenha o corpo (sem o braço que escreve) ou só o braço.
+export function drawPersonBack(ctx, w, h, who, { arm = false } = {}) {
+  const look = who === 'bruno'
+    ? { hood: '#1f2a44', hoodDark: '#151d31', pants: '#2c3446', hair: '#16110e', curly: true }
+    : { hood: '#141416', hoodDark: '#0a0a0b', pants: '#c8b48e', hair: '#1c140f', curly: false };
+  const [c, x] = makeCanvas(w, h);
+  const cx = w / 2;
+  const u = h / 100; // 1 unidade = 1% da altura
+  x.lineJoin = 'round';
+  x.lineCap = 'round';
+  if (!arm) {
+    // pernas
+    x.fillStyle = look.pants;
+    x.beginPath();
+    x.moveTo(cx - 13 * u, 52 * u);
+    x.lineTo(cx - 12 * u, 97 * u);
+    x.lineTo(cx - 2 * u, 97 * u);
+    x.lineTo(cx, 60 * u);
+    x.lineTo(cx + 2 * u, 97 * u);
+    x.lineTo(cx + 12 * u, 97 * u);
+    x.lineTo(cx + 13 * u, 52 * u);
+    x.closePath();
+    x.fill();
+    x.fillStyle = '#e9e6df';
+    x.fillRect(cx - 13 * u, 96 * u, 12 * u, 3 * u);
+    x.fillRect(cx + 1 * u, 96 * u, 12 * u, 3 * u);
+    // moletom
+    x.fillStyle = look.hood;
+    x.beginPath();
+    x.moveTo(cx - 9 * u, 16 * u);
+    x.quadraticCurveTo(cx - 21 * u, 17 * u, cx - 21 * u, 26 * u);
+    x.lineTo(cx - 17 * u, 56 * u);
+    x.lineTo(cx + 17 * u, 56 * u);
+    x.lineTo(cx + 21 * u, 26 * u);
+    x.quadraticCurveTo(cx + 21 * u, 17 * u, cx + 9 * u, 16 * u);
+    x.closePath();
+    x.fill();
+    // braço que fica para baixo (lado esquerdo de quem vê)
+    x.beginPath();
+    x.moveTo(cx - 20 * u, 24 * u);
+    x.lineTo(cx - 25 * u, 48 * u);
+    x.lineTo(cx - 19 * u, 49 * u);
+    x.lineTo(cx - 15 * u, 30 * u);
+    x.closePath();
+    x.fill();
+    x.fillStyle = '#b98a68';
+    x.beginPath(); x.ellipse(cx - 22.5 * u, 50.5 * u, 2.6 * u, 3 * u, 0, 0, Math.PI * 2); x.fill();
+    // capuz caído nas costas e costuras
+    x.fillStyle = look.hoodDark;
+    x.beginPath();
+    x.moveTo(cx - 10 * u, 15 * u);
+    x.quadraticCurveTo(cx, 30 * u, cx + 10 * u, 15 * u);
+    x.quadraticCurveTo(cx, 20 * u, cx - 10 * u, 15 * u);
+    x.fill();
+    x.strokeStyle = look.hoodDark;
+    x.lineWidth = 0.6 * u;
+    x.beginPath(); x.moveTo(cx - 16 * u, 52 * u); x.lineTo(cx + 16 * u, 52 * u); x.stroke();
+    // pescoço e cabeça (de costas: só cabelo e orelhas)
+    x.fillStyle = '#b98a68';
+    x.fillRect(cx - 4 * u, 11 * u, 8 * u, 6 * u);
+    x.beginPath(); x.ellipse(cx - 7.4 * u, 8 * u, 1.6 * u, 2.4 * u, 0, 0, Math.PI * 2); x.fill();
+    x.beginPath(); x.ellipse(cx + 7.4 * u, 8 * u, 1.6 * u, 2.4 * u, 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = look.hair;
+    x.beginPath(); x.ellipse(cx, 6.5 * u, 7.4 * u, 6.6 * u, 0, 0, Math.PI * 2); x.fill();
+    if (look.curly) {
+      const rand = seeded(44);
+      for (let i = 0; i < 46; i++) {
+        const a = rand() * Math.PI * 2, r = rand() * 6.5 * u;
+        x.beginPath(); x.arc(cx + Math.cos(a) * r, 5 * u + Math.sin(a) * r * 0.85 - 1.5 * u, 1.5 * u, 0, Math.PI * 2); x.fill();
+      }
+    }
+  } else {
+    // braço levantado escrevendo: sai do ombro (canto inferior esquerdo) para cima
+    x.fillStyle = look.hood;
+    x.beginPath();
+    x.moveTo(w * 0.18, h * 0.98);
+    x.lineTo(w * 0.62, h * 0.2);
+    x.lineTo(w * 0.86, h * 0.26);
+    x.lineTo(w * 0.52, h * 0.98);
+    x.closePath();
+    x.fill();
+    x.fillStyle = '#b98a68';
+    x.beginPath(); x.ellipse(w * 0.76, h * 0.17, w * 0.13, h * 0.08, -0.5, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#1f3a8a';
+    x.save();
+    x.translate(w * 0.82, h * 0.08);
+    x.rotate(0.5);
+    x.fillRect(-w * 0.04, -h * 0.06, w * 0.08, h * 0.12);
+    x.restore();
+  }
+  // borda branca de figurinha
+  const border = Math.round(h * 0.008);
+  ctx.clearRect(0, 0, w, h);
+  const [m, mx] = makeCanvas(w, h);
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) mx.drawImage(c, Math.cos(a) * border, Math.sin(a) * border);
+  mx.globalCompositeOperation = 'source-in';
+  mx.fillStyle = '#ffffff';
+  mx.fillRect(0, 0, w, h);
+  ctx.drawImage(m, 0, 0);
+  ctx.drawImage(c, 0, 0);
 }
 
 // Painel acústico de ripas diagonais (feltro cinza-taupe da sala R0x do Inteli).

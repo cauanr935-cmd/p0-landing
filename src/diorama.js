@@ -68,7 +68,7 @@ function start() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === 'high' ? 1.75 : 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.95;
+  renderer.toneMappingExposure = 0.9;
   renderer.shadowMap.enabled = quality === 'high';
   renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -100,8 +100,8 @@ function start() {
   const shadowy = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
 
   // Luz geral; as luzes da sala (pendente, LED, arandela) vêm com a sala.
-  scene.add(new THREE.HemisphereLight('#d7dcff', '#3a3030', 0.55));
-  const fill = new THREE.DirectionalLight('#dfe6ff', 0.55);
+  scene.add(new THREE.HemisphereLight('#c9cff5', '#2a2228', 0.16));
+  const fill = new THREE.DirectionalLight('#c9d3ff', 0.18);
   fill.position.set(-2, 6, 4);
   scene.add(fill);
 
@@ -117,6 +117,22 @@ function start() {
   // ── A sala R06 do Inteli ──
   const R = buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, makeVideo, renderer });
   const { key, onTable } = R;
+
+  // o ponto do Inteli no mapa: é nele que a sala se transforma no afastamento
+  const dotTex = (() => {
+    const [c, x] = paper.makeCanvas(128, 128);
+    const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, 'rgba(255,250,235,1)');
+    g.addColorStop(0.18, 'rgba(255,214,150,0.95)');
+    g.addColorStop(0.45, 'rgba(255,170,80,0.35)');
+    g.addColorStop(1, 'rgba(255,150,60,0)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, 128, 128);
+    return canvasTex(c);
+  })();
+  const inteliDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+  inteliDot.position.set(0, 0.1, 0);
+  scene.add(inteliDot);
 
   // Notebook com o terminal do EP 01 (a tela digita sozinha)
   const [lsC, lsX] = paper.makeCanvas(1024, 640);
@@ -342,7 +358,7 @@ function start() {
     shownSpread = -9;
   }
 
-  const PAGE_TINT = '#e8e2d4';
+  const PAGE_TINT = '#d6cebd';
   const leftMat = new THREE.MeshStandardMaterial({ color: PAGE_TINT, roughness: 0.95 });
   const rightMat = new THREE.MeshStandardMaterial({ color: PAGE_TINT, roughness: 0.95 });
   const pageGeo = new THREE.PlaneGeometry(PW, PH);
@@ -582,8 +598,9 @@ function start() {
     const far = (shot, k) => (narrow ? { pos: shot.look.clone().add(shot.pos.clone().sub(shot.look).multiplyScalar(k)), look: shot.look } : shot);
     const L = bookShot(-1), R = bookShot(1), C = bookShot(0);
     const list = [
-      [0, far({ pos: V(2.7, 1.65, 6.0), look: V(0.15, 1.3, 0.6) }, 1.3)],
-      [TL.intro.wide[1], far({ pos: V(0.78, 1.5, 2.75), look: V(0.3, 1.1, 0) }, 1.3)],
+      [0, far({ pos: V(3.4, 1.65, 6.0), look: V(0.85, 1.3, 0.6) }, 1.3)],
+      [TL.intro.wide[1], far({ pos: V(1.55, 1.5, 2.75), look: V(1.2, 1.1, 0) }, 1.3)],
+      [(TL.intro.wide[1] + TL.intro.table[1]) / 2, { pos: V(1.15, 1.42, 1.2), look: V(2.05, 1.3, -0.35) }],
       [TL.intro.table[1], far({ pos: V(0.55, 1.18, 0.95), look: V(0, onTable + 0.08, -0.1) }, 1.45)],
       [TL.cover[1], C],
     ];
@@ -890,6 +907,12 @@ function start() {
       s.position.y = onTable + u.lift * 0.008 + Math.sin(Math.PI * u.jump) * 0.04;
     });
 
+    // Cauan e Bruno escrevendo no quadro
+    R.writers.forEach((w) => {
+      const a = w.userData.arm;
+      a.rotation.z = -0.18 + Math.sin(time * 3.1 + w.userData.phase) * 0.07 + Math.sin(time * 7.3 + w.userData.phase) * 0.02;
+    });
+
     // celular vibra de tempos em tempos enquanto estamos na sala
     if (time > nextBuzz && t < TL.cover[1]) {
       nextBuzz = time + 7 + Math.random() * 4;
@@ -933,11 +956,16 @@ function start() {
 
     // afastamento: a sala encolhe até virar um ponto em São Paulo
     const pull = seg(t, TL.pull);
-    const s = 1 - ease(Math.min(1, pull * 1.7)) * 0.985;
+    const s = 1 - ease(Math.min(1, pull * 1.6)) * 0.995;
     room.scale.setScalar(s);
+    // a sala vira um ponto de luz como os outros do mapa
+    const melt = ease(seg(t, [0.905, 0.95]));
+    room.visible = melt < 0.98;
+    inteliDot.material.opacity = melt;
+    inteliDot.scale.setScalar(0.6 + 2.4 * melt + Math.sin(time * 2) * 0.12 * melt);
     key.intensity = 7 * s * s + 0.3;
     // no afastamento, só a sala fica: telhado, prédio e duto saem enquanto a câmera olha o caderno
-    R.roof.visible = R.outside.visible = t < TL.pull[0] + 0.004;
+    R.roof.visible = R.duct.visible = t < TL.pull[0] + 0.004;
     R.door.rotation.y = -1.35 * ease(seg(t, [0.045, 0.1]));
     coneMat.uniforms.uOpacity.value = s;
     mapMat.opacity = ease(seg(t, [0.885, 0.95]));
