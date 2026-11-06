@@ -58,6 +58,8 @@ function buildTimeline() {
   return { intro, cover, holds, flips, H, pull: [bookEnd, 1] };
 }
 const TL = buildTimeline();
+// duração da troca sala → mapa (fração do scroll): rápida, mas em dissolve
+const XF = 0.03;
 
 // ── Cena ──
 function start() {
@@ -72,6 +74,7 @@ function start() {
   renderer.shadowMap.enabled = quality === 'high';
   renderer.shadowMap.type = THREE.PCFShadowMap;
 
+  let fadeRT = null; // alvo da troca sala → mapa (criado na primeira vez)
   const manager = new THREE.LoadingManager();
   const shownAt = performance.now();
   manager.onProgress = (_url, done, total) => { loaderBar.style.transform = `scaleX(${done / total})`; };
@@ -132,7 +135,10 @@ function start() {
   })();
   const inteliDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
   inteliDot.position.set(0, 0.1, 0);
-  scene.add(inteliDot);
+  const mapGroup = new THREE.Group();
+  mapGroup.visible = false;
+  scene.add(mapGroup);
+  mapGroup.add(inteliDot);
 
   // Notebook com o terminal do EP 01 (a tela digita sozinha)
   const [lsC, lsX] = paper.makeCanvas(1024, 640);
@@ -471,7 +477,7 @@ function start() {
   const map = new THREE.Mesh(new THREE.PlaneGeometry(MAP_W, MAP_H), mapMat);
   map.rotation.x = -Math.PI / 2;
   map.position.set(-spX, -0.09, -spZ);
-  scene.add(map);
+  mapGroup.add(map);
 
   const pts = CITIES.map(([lon, lat]) => [lon, lat]);
   const rand = paper.seeded(7);
@@ -530,7 +536,7 @@ function start() {
         gl_FragColor = vec4(c, (core + glow) * vOn);
       }`,
   });
-  scene.add(new THREE.Points(dotGeo, dotMat));
+  mapGroup.add(new THREE.Points(dotGeo, dotMat));
 
   // Arcos de São Paulo até as capitais: mentorias entre universidades.
   const arcs = [];
@@ -543,7 +549,7 @@ function start() {
     const line = new THREE.Line(geo, mat);
     line.geometry.setDrawRange(0, 0);
     line.userData.delay = i / CITIES.length;
-    scene.add(line);
+    mapGroup.add(line);
     arcs.push(line);
   });
 
@@ -584,12 +590,17 @@ function start() {
       list.push([e, R]);
     });
     list.push([TL.pull[0] + 0.005, C]);
-    list.push([0.93, { pos: V(0, 7, 3.5), look: V(0, 0, 0) }]);
-    list.push([1, mapShot()]);
+    // durante a troca para o mapa, a câmera da sala só sobe um pouco sobre o caderno
+    list.push([TL.pull[0] + XF, { pos: C.pos.clone().add(V(0, 0.35, 0.1)), look: C.look }]);
+    list.push([1, { pos: C.pos.clone().add(V(0, 0.35, 0.1)), look: C.look }]);
     return list;
   }
   let SHOTS = shots();
-  const camP = new THREE.Vector3(), camL = new THREE.Vector3();
+  // câmera do mapa: começa perto de São Paulo e abre até o Brasil inteiro
+  const mapCam = new THREE.PerspectiveCamera(40, 1, 0.1, 400);
+  let MAP_FINAL = mapShot();
+  const MAP_NEAR = { pos: V(-1.5, 16, 2.5), look: V(-1.5, 0, -1) };
+  const camP = new THREE.Vector3(), camL = new THREE.Vector3(), tmpLook = new THREE.Vector3();
   function cameraAt(t) {
     for (let i = 1; i < SHOTS.length; i++) {
       const [t1, b] = SHOTS[i];
@@ -669,8 +680,8 @@ function start() {
     intro: TL.intro.wide,
     table: TL.intro.table,
     cover: [TL.cover[0] - 0.005, TL.cover[1]],
-    pull1: [TL.pull[0] + 0.01, 0.935],
-    pull2: [0.945, 1.01],
+    pull1: [TL.pull[0] - 0.004, TL.pull[0] + XF + 0.035],
+    pull2: [TL.pull[0] + XF + 0.045, 1.01],
   };
   const voteIdx = chapters.findIndex((c) => c.vote);
   const newsIdx = chapters.findIndex((c) => c.newsletter);
@@ -815,7 +826,12 @@ function start() {
     camera.aspect = w / h;
     camera.fov = w / h < 0.8 ? 52 : 40;
     camera.updateProjectionMatrix();
+    mapCam.aspect = w / h;
+    mapCam.fov = camera.fov;
+    mapCam.updateProjectionMatrix();
     SHOTS = shots();
+    MAP_FINAL = mapShot();
+    if (fadeRT) fadeRT.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio());
   }
   window.addEventListener('resize', resize);
   resize();
@@ -832,6 +848,19 @@ function start() {
     v.preload = 'auto';
     v.crossOrigin = 'anonymous';
     return v;
+  }
+
+  // ── Troca sala → mapa: as duas cenas se fundem (dissolve) ──
+  const fadeScene = new THREE.Scene();
+  const fadeCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const fadeMat = new THREE.MeshBasicMaterial({ transparent: true, depthTest: false, depthWrite: false });
+  fadeScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fadeMat));
+  function ensureRT() {
+    if (fadeRT) return;
+    const pr = renderer.getPixelRatio();
+    fadeRT = new THREE.WebGLRenderTarget(window.innerWidth * pr, window.innerHeight * pr, { type: THREE.HalfFloatType, samples: 4 });
+    fadeMat.map = fadeRT.texture;
+    fadeMat.needsUpdate = true;
   }
 
   // ── Loop ──
@@ -914,33 +943,49 @@ function start() {
       dustGeo.attributes.position.needsUpdate = true;
     }
 
-    // afastamento: a sala encolhe até virar um ponto em São Paulo
-    const pull = seg(t, TL.pull);
-    const s = 1 - ease(Math.min(1, pull * 1.6)) * 0.995;
-    room.scale.setScalar(s);
-    // a sala vira um ponto de luz como os outros do mapa
-    const melt = ease(seg(t, [0.905, 0.95]));
-    room.visible = melt < 0.98;
-    inteliDot.material.opacity = melt;
-    inteliDot.scale.setScalar(0.6 + 2.4 * melt + Math.sin(time * 2) * 0.12 * melt);
-    key.intensity = 7 * s * s + 0.3;
-    // no afastamento, só a sala fica: telhado, prédio e duto saem enquanto a câmera olha o caderno
-    R.roof.visible = R.duct.visible = t < TL.pull[0] + 0.004;
+    // afastamento: a sala some num dissolve rápido e o mapa do Brasil aparece
+    const TA = TL.pull[0], TB = TL.pull[0] + XF;
+    const fade = ease(seg(t, [TA, TB]));
     R.door.rotation.y = -1.35 * ease(seg(t, [0.045, 0.1]));
-    coneMat.uniforms.uOpacity.value = s;
-    mapMat.opacity = ease(seg(t, [0.885, 0.95]));
-    const lightUp = ease(seg(t, [0.935, 1.0]));
+    const mk = ease(seg(t, [TA, 1]));
+    mapCam.position.lerpVectors(MAP_NEAR.pos, MAP_FINAL.pos, mk);
+    tmpLook.lerpVectors(MAP_NEAR.look, MAP_FINAL.look, mk);
+    mapCam.lookAt(tmpLook);
+    mapMat.opacity = 1;
+    inteliDot.material.opacity = 1;
+    inteliDot.scale.setScalar(2.6 + Math.sin(time * 2) * 0.25);
+    const lightUp = ease(seg(t, [TB, 1.0]));
     dotMat.uniforms.uProgress.value = lightUp * 1.04;
     dotMat.uniforms.uTime.value = time;
     arcs.forEach((line) => {
       const k = clamp01((lightUp - line.userData.delay * 0.6) / 0.35);
       line.geometry.setDrawRange(0, Math.floor(k * 49));
     });
-    scene.fog.near = 10 + pull * 120;
-    scene.fog.far = 26 + pull * 200;
 
     placeBubble();
-    renderer.render(scene, camera);
+    const renderRoom = () => {
+      room.visible = true; mapGroup.visible = false;
+      scene.fog.near = 10; scene.fog.far = 26;
+      renderer.render(scene, camera);
+    };
+    const renderMap = () => {
+      room.visible = false; mapGroup.visible = true;
+      scene.fog.near = 200; scene.fog.far = 400;
+      renderer.render(scene, mapCam);
+    };
+    if (t < TA) renderRoom();
+    else if (t >= TB) renderMap();
+    else {
+      ensureRT();
+      renderer.setRenderTarget(fadeRT);
+      renderRoom();
+      renderer.setRenderTarget(null);
+      renderMap();
+      fadeMat.opacity = 1 - fade;
+      renderer.autoClear = false;
+      renderer.render(fadeScene, fadeCam);
+      renderer.autoClear = true;
+    }
     requestAnimationFrame(frame);
   }
   document.documentElement.classList.add('has-3d');
