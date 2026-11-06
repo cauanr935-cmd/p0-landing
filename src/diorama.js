@@ -147,9 +147,41 @@ function start() {
   const alu = std('#a3a8ae', { metalness: 0.75, roughness: 0.32 });
   const laptop = new THREE.Group();
   const lbase = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.016, 0.24, 2, 0.006), alu));
-  const keys = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.1), std('#2a2c30', { roughness: 0.6 }));
-  keys.rotation.x = -Math.PI / 2;
-  keys.position.set(0, 0.0085, -0.02);
+  // teclado de teclas pretas e trackpad, como o notebook da foto
+  const keys = new THREE.Group();
+  const keyGeo = new RoundedBoxGeometry(1, 1, 1, 2, 0.18);
+  const keyMat = std('#1b1c1f', { roughness: 0.55 });
+  const rowsK = [
+    { n: 14, h: 0.009 },          // fileira de funções, mais baixa
+    { n: 14 }, { n: 14 }, { n: 13 }, { n: 12 },
+    { n: 0, space: true },
+  ];
+  const KW = 0.0185, GAP = 0.0028, KD = 0.0165;
+  const allKeys = [];
+  let zK = -0.108;
+  rowsK.forEach((row) => {
+    const d = row.h || KD;
+    if (row.space) {
+      // fileira de baixo: ctrl, fn, win, alt, espaço grande, alt gr, setas
+      const widths = [1.3, 1, 1, 1.2, 6, 1.2, 1, 1, 1];
+      const total = widths.reduce((a, b) => a + b, 0) * KW + (widths.length - 1) * GAP;
+      let x = -total / 2;
+      widths.forEach((w) => { allKeys.push([x + (w * KW) / 2, zK + d / 2, w * KW, d]); x += w * KW + GAP; });
+    } else {
+      const total = row.n * KW + (row.n - 1) * GAP;
+      for (let i = 0; i < row.n; i++) {
+        // teclas das pontas mais largas (tab, caps, shift, enter)
+        allKeys.push([-total / 2 + i * (KW + GAP) + KW / 2, zK + d / 2, KW, d]);
+      }
+    }
+    zK += d + GAP;
+  });
+  const keyMesh = new THREE.InstancedMesh(keyGeo, keyMat, allKeys.length);
+  allKeys.forEach(([x, z, w, d], i) => keyMesh.setMatrixAt(i, new THREE.Matrix4().compose(new THREE.Vector3(x, 0.0095, z), new THREE.Quaternion(), new THREE.Vector3(w, 0.003, d))));
+  keys.add(keyMesh);
+  const pad = new THREE.Mesh(new RoundedBoxGeometry(0.12, 0.001, 0.068, 2, 0.0004), std('#bfc3c8', { metalness: 0.55, roughness: 0.28 }));
+  pad.position.set(0, 0.0083, 0.068);
+  keys.add(pad);
   const lid = new THREE.Group();
   const lidBox = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.22, 0.01, 2, 0.004), alu));
   lidBox.position.y = 0.11;
@@ -265,15 +297,6 @@ function start() {
   const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.78, beamH, 40, 1, true), coneMat);
   cone.position.set(R.beam.x, onTable + beamH / 2, R.beam.z);
   room.add(cone);
-  const dustN = quality === 'high' ? 380 : 160;
-  const dustPos = new Float32Array(dustN * 3);
-  for (let i = 0; i < dustN; i++) {
-    dustPos.set([(Math.random() - 0.5) * 1.2, 0.8 + Math.random() * 1.2, -0.05 + (Math.random() - 0.5) * 1.1], i * 3);
-  }
-  const dustGeo = new THREE.BufferGeometry();
-  dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: '#ffe2a8', map: steamTex, size: 0.008, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
-  room.add(dust);
 
 
   // ── O diário ──
@@ -887,7 +910,6 @@ function start() {
           quality = 'low';
           renderer.setPixelRatio(1);
           renderer.shadowMap.enabled = false;
-          dust.visible = false;
         }
       }
     }
@@ -932,16 +954,6 @@ function start() {
       s.material.opacity = Math.sin(Math.PI * k) * (0.35 + steamBoost * 0.4);
     });
 
-    // poeira no feixe
-    if (dust.visible) {
-      const arr = dustGeo.attributes.position.array;
-      for (let i = 0; i < arr.length; i += 3) {
-        arr[i + 1] += dt * 0.012;
-        arr[i] += Math.sin(time * 0.3 + i) * dt * 0.004;
-        if (arr[i + 1] > 2.0) arr[i + 1] = 0.8;
-      }
-      dustGeo.attributes.position.needsUpdate = true;
-    }
 
     // afastamento: a sala some num dissolve rápido e o mapa do Brasil aparece
     const TA = TL.pull[0], TB = TL.pull[0] + XF;

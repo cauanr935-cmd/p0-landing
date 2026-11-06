@@ -130,8 +130,9 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     for (let i = 0; i < 6; i++) mats.push(plyMat(i < 2 ? D + T : T, EV));
     mats[inner] = slatMat(D + T, EV);
     mats[3] = shell;
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(T, EV, D + T), mats);
-    wall.position.set(side * (W / 2 + T / 2), EV / 2, ZC - T / 2);
+    const WH = EV + 0.05; // o topo entra no telhado
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(T, WH, D + T), mats);
+    wall.position.set(side * (W / 2 + T / 2), WH / 2, ZC - T / 2);
     wall.receiveShadow = true;
     wall.castShadow = true;
     shellGroup.add(wall);
@@ -168,8 +169,10 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     g.rotation.z = -side * theta;
     const ceil = new THREE.Mesh(new THREE.PlaneGeometry(Ls, D), ceilingMat);
     ceil.rotation.x = Math.PI / 2;
-    const out = shadowy(new THREE.Mesh(new THREE.BoxGeometry(Ls + 0.16, 0.035, D + 2 * T + 0.12), [plyShape, plyShape, plyMat(Ls, D), plyShape, plyShape, plyShape]));
-    out.position.y = T + 0.0175;
+    // telhado maciço: começa colado no forro e cobre o topo das paredes, sem fresta
+    const slab = T + 0.04;
+    const out = shadowy(new THREE.Mesh(new THREE.BoxGeometry(Ls + 0.16, slab, D + 2 * T + 0.12), [plyShape, plyShape, plyMat(Ls, D), plyShape, plyShape, plyShape]));
+    out.position.y = slab / 2 + 0.001;
     out.castShadow = false;
     // fita de LED correndo da frente ao fundo
     const led = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.012, D * 0.78), std('#d9d6cf', { roughness: 0.4 })); // apagada
@@ -178,8 +181,8 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     leds.push(led);
     roof.add(g);
   });
-  const ridgeCap = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, D + 2 * T + 0.12), plyShape);
-  ridgeCap.position.set(0, RG + T + 0.02, ZC);
+  const ridgeCap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, D + 2 * T + 0.12), plyShape);
+  ridgeCap.position.set(0, RG + (T + 0.04) / Math.cos(theta) - 0.01, ZC);
   roof.add(ridgeCap);
 
   // ── Frente: moldura de pinus, vidro, caixilho branco e porta ──
@@ -455,42 +458,63 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   modesty.position.set(0, 0.58, -0.3);
   furniture.add(modesty);
 
-  const [pfC, pfX] = paper.makeCanvas(256, 256);
-  paper.drawPerforated(pfX, 256, 256);
-  const perfTex = canvasTex(pfC);
-  const creamShell = std('#ffffff', { map: perfTex, roughness: 0.55, side: THREE.DoubleSide });
-  const cream = std('#e6e2d8', { roughness: 0.55 });
-  const greySeat = std('#6b6e72', { roughness: 0.95 });
+  // Cadeira do Inteli (foto): encosto branco liso com furinhos só na parte de
+  // baixo, assento preto, braços brancos sobre suportes cinza-escuros que
+  // seguram o encosto, base de 5 pés com rodízios.
+  const chairWhite = std('#e9e8e4', { roughness: 0.45 });
+  const chairDark = std('#3b3c40', { roughness: 0.45, metalness: 0.35 });
+  const blackSeat = std('#1f2023', { roughness: 0.42 });
+  const holes = (() => {
+    const [hc, hx] = paper.makeCanvas(256, 256);
+    hx.fillStyle = '#e9e8e4';
+    hx.fillRect(0, 0, 256, 256);
+    hx.fillStyle = 'rgba(60,58,55,0.6)';
+    for (let y = 150; y < 225; y += 11) {
+      const spread = 0.42 - (y - 150) * 0.0012;
+      for (let x = 128 - 256 * spread; x < 128 + 256 * spread; x += 12) {
+        hx.beginPath(); hx.arc(x + ((y / 11) % 2) * 6, y, 2.4, 0, Math.PI * 2); hx.fill();
+      }
+    }
+    return canvasTex(hc);
+  })();
+  const backMat = std('#ffffff', { map: holes, roughness: 0.45, side: THREE.DoubleSide });
   function officeChair(x, z, ry) {
     const g = new THREE.Group();
     for (let i = 0; i < 5; i++) {
       const a = (i / 5) * Math.PI * 2;
-      const spoke = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.03, 0.045), cream));
+      const spoke = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.03, 0.045), chairWhite));
       spoke.position.set(Math.cos(a) * 0.15, 0.06, Math.sin(a) * 0.15);
       spoke.rotation.y = -a;
-      const caster = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 8), cream);
+      const caster = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 8), chairWhite);
       caster.position.set(Math.cos(a) * 0.29, 0.025, Math.sin(a) * 0.29);
       g.add(spoke, caster);
     }
-    const gas = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.03, 0.36, 12), std('#3a3a3d', { metalness: 0.5, roughness: 0.4 }));
+    const gas = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.03, 0.36, 12), chairDark);
     gas.position.y = 0.25;
-    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.48, 0.08, 0.46, 3, 0.035), greySeat));
+    // assento preto, almofadado e arredondado
+    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.47, 0.075, 0.45, 4, 0.034), blackSeat));
     seat.position.y = 0.47;
-    const pan = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.03, 0.42, 2, 0.01), cream);
+    const pan = new THREE.Mesh(new RoundedBoxGeometry(0.4, 0.025, 0.38, 2, 0.008), chairDark);
     pan.position.y = 0.425;
-    const back = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.48, 24, 1, true, Math.PI - 0.62, 1.24), creamShell));
-    back.position.set(0, 0.8, 0.2);
-    back.rotation.x = -0.08;
-    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.03), cream);
-    spine.position.set(0, 0.6, -0.2);
-    spine.rotation.x = 0.25;
-    g.add(gas, seat, pan, back, spine);
+    // encosto: casca branca levemente curva, mais larga em cima
+    const backGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.42, 28, 1, true, Math.PI - 0.6, 1.2);
+    const back = shadowy(new THREE.Mesh(backGeo, backMat));
+    back.position.set(0, 0.84, 0.21);
+    back.rotation.x = -0.1;
+    g.add(gas, seat, pan, back);
     [-1, 1].forEach((s) => {
-      const arm = new THREE.Mesh(new RoundedBoxGeometry(0.07, 0.025, 0.25, 2, 0.01), cream);
-      arm.position.set(s * 0.27, 0.66, 0.02);
-      const strut = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.18, 0.04), cream);
-      strut.position.set(s * 0.27, 0.56, -0.06);
-      g.add(arm, strut);
+      // suporte em L cinza-escuro: sai de baixo do assento e sobe até o encosto
+      const low = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.03, 0.3), chairDark));
+      low.position.set(s * 0.235, 0.44, -0.06);
+      const up = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.28, 0.035), chairDark));
+      up.position.set(s * 0.235, 0.57, -0.2);
+      up.rotation.x = -0.1;
+      // braço branco largo por cima
+      const arm = shadowy(new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.028, 0.26, 3, 0.012), chairWhite));
+      arm.position.set(s * 0.25, 0.67, -0.03);
+      const armPost = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.2, 0.04), chairDark);
+      armPost.position.set(s * 0.25, 0.56, -0.05);
+      g.add(low, up, arm, armPost);
     });
     g.position.set(x, 0, z);
     g.rotation.y = ry;
