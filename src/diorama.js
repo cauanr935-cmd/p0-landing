@@ -269,43 +269,6 @@ function start() {
   const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: '#fff3dd', map: steamTex, size: 0.008, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
   room.add(dust);
 
-  // ── Figurinhas de papel (Cauan e Bruno) ──
-  const paperBack = std('#f4f1ea', { roughness: 0.95 });
-  function standee(src, height, x, z, ry, name, quote) {
-    const g = new THREE.Group();
-    const geo = new THREE.PlaneGeometry(1, 1);
-    geo.translate(0, 0.5, 0);
-    const t = texLoader.load(src, (texture) => {
-      const a = texture.image.width / texture.image.height;
-      body.scale.set(height * a, height, 1);
-    });
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.anisotropy = 8;
-    const body = new THREE.Group();
-    const front = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: t, alphaTest: 0.5, roughness: 0.9 }));
-    front.castShadow = true;
-    front.position.z = 0.0012;
-    // verso: a mesma silhueta em papel liso (PNG gerado a partir do recorte)
-    const tb = texLoader.load(src.replace(/\.png$/, '-verso.png'));
-    tb.colorSpace = THREE.SRGBColorSpace;
-    const back = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tb, alphaTest: 0.5, roughness: 0.95, side: THREE.BackSide }));
-    back.position.z = -0.0012;
-    // borda: a silhueta um pouco mais escura entre frente e verso, dá espessura
-    const edge = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tb, color: '#cfc9bc', alphaTest: 0.5, side: THREE.DoubleSide }));
-    body.add(front, edge, back);
-    const fold = shadowy(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.002, 0.05), paperBack));
-    fold.position.set(0, 0.001, 0.022);
-    g.add(body, fold);
-    g.position.set(x, onTable, z);
-    g.rotation.y = ry;
-    g.userData = { baseRy: ry, lift: 0, name };
-    room.add(g);
-    clickable(g, name, () => { g.userData.jump = 1; sfx.pop(); bubbleAt(g, quote, 'fundadores.html', 'conhecer os fundadores →'); });
-    return g;
-  }
-  const cauan = standee('/scene/cauan.png', 0.3, -0.36, -0.2, 0.25, 'Cauan', 'Quero ser lembrado por construir algo grande.');
-  const bruno = standee('/scene/bruno.png', 0.28, 0.32, -0.3, -0.3, 'Bruno', 'CTO, CFO e outros C-levels dessa bagaça.');
-  const figurines = [cauan, bruno];
 
   // ── O diário ──
   const PW = 0.21, PH = 0.29;
@@ -906,16 +869,6 @@ function start() {
 
     const bk = updateBook(t);
     updateOverlays(t, bk);
-
-    // figurinhas: balanço de papel, olhar para o cursor, pulo ao clicar
-    figurines.forEach((s, i) => {
-      const u = s.userData;
-      u.lift += ((hovered === s ? 1 : 0) - u.lift) * 0.15;
-      u.jump = Math.max(0, (u.jump || 0) - dt * 1.6);
-      s.rotation.y = u.baseRy + Math.sin(time * 1.3 + i * 2) * 0.05 + (pointer.has ? pointer.x * 0.25 : 0);
-      s.rotation.z = Math.sin(time * 1.7 + i) * 0.015;
-      s.position.y = onTable + u.lift * 0.008 + Math.sin(Math.PI * u.jump) * 0.04;
-    });
 
     // Cauan e Bruno escrevendo no quadro
     if (t < TL.cover[1] + 0.02) R.updateWriters(dt, time);

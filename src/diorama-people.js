@@ -252,9 +252,8 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
   }
 
   // ── cabelo esculpido no estilo de animação, igual para os dois: base lisa e
-  // rente nas laterais + topete de mechas grossas, curvas, varridas para trás.
-  // O do Cauan é um pouco mais alto e mais longo atrás. ──
-  let seed = who === 'cauan' ? 11 : 23;
+  // rente nas laterais + topete de mechas grossas, curvas, varridas para trás ──
+  let seed = 23;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const hairM = new THREE.MeshPhysicalMaterial({ color: L.hair, roughness: 0.42, clearcoat: 0.3, clearcoatRoughness: 0.5 });
   const lockGeo = (() => {
@@ -281,7 +280,6 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
     m.scale.setScalar(size);
     head.add(m);
   };
-  const tall = who === 'cauan' ? 1.15 : 1;
   const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.106, 36, 22, 0, Math.PI * 2, 0, 1.72), hairM));
   cap.scale.set(fw * 1.04, 1.08, 1.06);
   cap.rotation.x = -0.62;
@@ -293,14 +291,13 @@ export function buildPerson(who, { std, shadowy, boardDistance = 0.44, phase = 0
     { z: 0.0, y: 0.11, dir: [0.55, -0.85], size: 1.0 },
     { z: -0.045, y: 0.098, dir: [0.35, -1], size: 0.9 },
   ];
-  if (who === 'cauan') rows.push({ z: -0.085, y: 0.07, dir: [0.1, -1], size: 0.85 });
   rows.forEach((r, ri) => {
     const n = ri === 0 ? 5 : 6;
     for (let i = 0; i < n; i++) {
       const x = (i / (n - 1) - 0.5) * 0.12 * fw + (rand() - 0.5) * 0.01;
       const y = r.y - x * x * 3;
       const dir = new THREE.Vector3(x * 1.2, r.dir[0], r.dir[1]);
-      addLock(new THREE.Vector3(x, y, r.z), dir, r.size * tall * (0.85 + rand() * 0.3));
+      addLock(new THREE.Vector3(x, y, r.z), dir, r.size * (0.85 + rand() * 0.3));
     }
   });
 
