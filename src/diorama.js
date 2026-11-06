@@ -86,7 +86,7 @@ function start() {
   scene.fog = new THREE.Fog('#07050d', 10, 26);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.28;
+  scene.environmentIntensity = 0.07; // quase nada de luz ambiente: quem ilumina é a luminária
 
   const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 400);
 
@@ -100,8 +100,8 @@ function start() {
   const shadowy = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
 
   // Luz geral; as luzes da sala (pendente, LED, arandela) vêm com a sala.
-  scene.add(new THREE.HemisphereLight('#c9cff5', '#2a2228', 0.16));
-  const fill = new THREE.DirectionalLight('#c9d3ff', 0.18);
+  scene.add(new THREE.HemisphereLight('#aab2d8', '#1a1418', 0.05));
+  const fill = new THREE.DirectionalLight('#aeb8e6', 0.05);
   fill.position.set(-2, 6, 4);
   scene.add(fill);
 
@@ -253,7 +253,7 @@ function start() {
     side: THREE.DoubleSide,
     uniforms: { uOpacity: { value: 1 } },
     vertexShader: 'varying float vY; void main(){ vY = uv.y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'varying float vY; uniform float uOpacity; void main(){ gl_FragColor = vec4(1.0,0.92,0.8, 0.07 * pow(vY, 1.3) * uOpacity); }',
+    fragmentShader: 'varying float vY; uniform float uOpacity; void main(){ gl_FragColor = vec4(1.0,0.86,0.58, 0.08 * pow(vY, 1.3) * uOpacity); }',
   });
   const beamH = R.beam.top - onTable;
   const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.78, beamH, 40, 1, true), coneMat);
@@ -266,7 +266,7 @@ function start() {
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: '#fff3dd', map: steamTex, size: 0.008, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: '#ffe2a8', map: steamTex, size: 0.008, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
   room.add(dust);
 
 

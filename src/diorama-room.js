@@ -104,7 +104,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   });
   // janelas altas do galpão (só a luz, ao fundo)
   for (let i = 0; i < 4; i++) {
-    const win = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.2), new THREE.MeshBasicMaterial({ color: '#cfe0ea' }));
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.2), new THREE.MeshBasicMaterial({ color: '#1b2027' })); // noite lá fora
     win.position.set(-1.4 + i * 1.5, 4.4, -2.99);
     outside.add(win);
   }
@@ -344,14 +344,12 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
 
   const sconce = new THREE.Group();
   const sconceBar = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.06, 1.0), std('#2b2622', { roughness: 0.5 }));
-  const glow = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.006, 0.96), new THREE.MeshBasicMaterial({ color: '#ffc27a' }));
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.006, 0.96), std('#3a3128', { roughness: 0.5 })); // arandela apagada
   glow.position.y = -0.033;
   sconce.add(sconceBar, glow);
   sconce.position.set(x1 + T + 0.03, 1.7, 0.2);
   pod.add(sconce);
-  const warm = new THREE.PointLight('#ffb36b', 1.6, 2.6, 2);
-  warm.position.set(x1 + T + 0.2, 1.55, 0.2);
-  pod.add(warm);
+
 
   // ── Por dentro: TV, grelha do ar, quadro branco, pendente ──
   const [tvC, tvX] = paper.makeCanvas(1280, 720);
@@ -415,7 +413,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.24, 0.22, 36, 1, true), sage);
   const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.02, 20), sage);
   cap.position.y = 0.11;
-  const bulb = new THREE.Mesh(new THREE.CircleGeometry(0.22, 32), new THREE.MeshBasicMaterial({ color: '#fff3dc' }));
+  const bulb = new THREE.Mesh(new THREE.CircleGeometry(0.22, 32), new THREE.MeshBasicMaterial({ color: '#ffe0a0' }));
   bulb.rotation.x = Math.PI / 2;
   bulb.position.y = -0.09;
   const ceilAt = RG - POD.cx * slope; // teto inclinado acima da mesa
@@ -426,7 +424,8 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   furniture.add(lamp);
 
   // ── Luzes da sala ──
-  const key = new THREE.SpotLight('#ffdcae', 3.4, 8, Math.PI / 2.8, 0.9, 1.4);
+  // só a luminária do meio fica acesa: luz amarelada de escritório de startup à noite
+  const key = new THREE.SpotLight('#ffd590', 4.2, 9, Math.PI / 2.6, 0.9, 1.3);
   key.position.set(0, 2.0, -0.05);
   key.target.position.set(0, 0.75, -0.05);
   key.castShadow = true;
@@ -436,12 +435,10 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
   key.shadow.camera.near = 0.2;
   furniture.add(key, key.target);
   // o resto da sala só recebe o que vaza da luminária
-  const spill = new THREE.PointLight('#ffcf9a', 1.1, 4.5, 1.8);
+  const spill = new THREE.PointLight('#ffcd84', 1.5, 6, 1.6);
   spill.position.set(0, 1.95, -0.05);
   furniture.add(spill);
-  const tvGlow = new THREE.PointLight('#8f7bff', 0.5, 2.4, 2);
-  tvGlow.position.set(x0 + 0.5, 1.55, 0);
-  pod.add(tvGlow);
+
 
   // ── Mesa de carvalho e cadeiras ──
   const topMat = std('#ffffff', { map: tiled(oak, 1, 1), roughness: 0.5 });
@@ -719,7 +716,7 @@ export function buildRoom({ room, std, canvasTex, shadowy, clickable, bubbleAt, 
     tv,
     tvVideo,
     drawClock,
-    exteriorLights: [warm],
+    exteriorLights: [],
     beam: { x: 0, top: 2.0, z: -0.05 },
   };
 }
