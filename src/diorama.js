@@ -60,6 +60,8 @@ function buildTimeline() {
 const TL = buildTimeline();
 // duração da troca sala → mapa (fração do scroll): rápida, mas em dissolve
 const XF = 0.03;
+// antes da troca, a câmera sobe do caderno até ver a sala inteira de cima
+const RISE = 0.045, HOLD = 0.012;
 
 // ── Cena ──
 function start() {
@@ -614,8 +616,13 @@ function start() {
     });
     list.push([TL.pull[0] + 0.005, C]);
     // durante a troca para o mapa, a câmera da sala só sobe um pouco sobre o caderno
-    list.push([TL.pull[0] + XF, { pos: C.pos.clone().add(V(0, 0.35, 0.1)), look: C.look }]);
-    list.push([1, { pos: C.pos.clone().add(V(0, 0.35, 0.1)), look: C.look }]);
+    // sobe até a vista de cima da sala (sem telhado) e segura um instante
+    const top = narrow
+      ? { pos: V(0.25, 4.6, 0.75), look: V(0.25, 0.75, 0.05) }
+      : { pos: V(0.1, 3.85, 0.7), look: V(0.1, 0.75, 0.02) };
+    list.push([TL.pull[0] + RISE, top]);
+    list.push([TL.pull[0] + RISE + HOLD, top]);
+    list.push([1, { pos: top.pos.clone().add(V(0, 0.4, 0)), look: top.look }]);
     return list;
   }
   let SHOTS = shots();
@@ -703,8 +710,8 @@ function start() {
     intro: TL.intro.wide,
     table: TL.intro.table,
     cover: [TL.cover[0] - 0.005, TL.cover[1]],
-    pull1: [TL.pull[0] - 0.004, TL.pull[0] + XF + 0.035],
-    pull2: [TL.pull[0] + XF + 0.045, 1.01],
+    pull1: [TL.pull[0] + 0.012, TL.pull[0] + RISE + HOLD + XF + 0.02],
+    pull2: [TL.pull[0] + RISE + HOLD + XF + 0.03, 1.01],
   };
   const voteIdx = chapters.findIndex((c) => c.vote);
   const newsIdx = chapters.findIndex((c) => c.newsletter);
@@ -956,7 +963,9 @@ function start() {
 
 
     // afastamento: a sala some num dissolve rápido e o mapa do Brasil aparece
-    const TA = TL.pull[0], TB = TL.pull[0] + XF;
+    const TA = TL.pull[0] + RISE + HOLD, TB = TA + XF;
+    // ao subir, o telhado e o prédio em volta saem para a câmera ver a sala de cima
+    R.roof.visible = R.duct.visible = R.outside.visible = t < TL.pull[0] + 0.004;
     const fade = ease(seg(t, [TA, TB]));
     R.door.rotation.y = -1.35 * ease(seg(t, [0.045, 0.1]));
     const mk = ease(seg(t, [TA, 1]));
